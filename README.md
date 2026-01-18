@@ -14,7 +14,7 @@ Traditional satellite health monitoring systems:
 - **Confounding effects** (e.g., reduced power affects multiple subsystems)
 - **Causal attribution**, not correlation (distinguishing cause from consequence)
 
-This is research-level work that ISRO currently lacks as a formal framework.
+This is some good stuff that ISRO currently lacks as a formal framework.
 
 ---
 
@@ -23,46 +23,46 @@ This is research-level work that ISRO currently lacks as a formal framework.
 ```
 ┌────────────────────────────────────────────────────────────────┐
 │                    OBSERVATION LAYER                           │
-│  ┌──────────────────────────┐  ┌──────────────────────────┐   │
-│  │   Power Telemetry        │  │  Thermal Telemetry       │   │
-│  │  - solar_input           │  │  - battery_temp          │   │
-│  │  - battery_voltage       │  │  - panel_temp            │   │
-│  │  - battery_charge        │  │  - payload_temp          │   │
-│  │  - bus_voltage           │  │  - bus_current           │   │
-│  └──────────────────────────┘  └──────────────────────────┘   │
-└────────────────────┬────────────────────────────────────────────┘
+│  ┌──────────────────────────┐  ┌──────────────────────────┐    │
+│  │   Power Telemetry        │  │  Thermal Telemetry       │    │
+│  │  - solar_input           │  │  - battery_temp          │    │
+│  │  - battery_voltage       │  │  - panel_temp            │    │
+│  │  - battery_charge        │  │  - payload_temp          │    │
+│  │  - bus_voltage           │  │  - bus_current           │    │
+│  └──────────────────────────┘  └──────────────────────────┘    │
+└────────────────────┬───────────────────────────────────────────┘
                      │ Detect Anomalies (>15% deviation)
                      │
 ┌────────────────────────────────────────────────────────────────┐
 │                      CAUSAL GRAPH (DAG)                        │
 │                                                                │
-│  ROOT CAUSES (7)          INTERMEDIATES (8)    OBSERVABLES (8)│
-│  ┌──────────────────┐     ┌────────────────┐  ┌────────────┐ │
-│  │ solar_degr.      │────→│ solar_input    │─→│ measured   │ │
-│  │ battery_aging    │────→│ battery_state  │─→│ telemetry  │ │
-│  │ battery_thermal  │────→│ battery_temp   │─→│  (8 types) │ │
-│  │ sensor_bias      │     │ bus_regulation │  │            │ │
-│  │ panel_insul.     │────→│ battery_eff.   │  └────────────┘ │
-│  │ heatsink_fail    │────→│ thermal_stress │                 │
-│  │ radiator_degrad. │     └────────────────┘                 │
-│  └──────────────────┘                                         │
-│         (29 edges with weights & mechanisms)                  │
-└────────────────────┬────────────────────────────────────────────┘
+│  ROOT CAUSES (7)          INTERMEDIATES (8)    OBSERVABLES (8) │
+│  ┌──────────────────┐     ┌────────────────┐  ┌────────────┐   │
+│  │ solar_degr.      │────→│ solar_input    │─→│ measured   │   │
+│  │ battery_aging    │────→│ battery_state  │─→│ telemetry  │   │
+│  │ battery_thermal  │────→│ battery_temp   │─→│  (8 types) │   │
+│  │ sensor_bias      │     │ bus_regulation │  │            │   │
+│  │ panel_insul.     │────→│ battery_eff.   │  └────────────┘   │
+│  │ heatsink_fail    │────→│ thermal_stress │                   │
+│  │ radiator_degrad. │     └────────────────┘                   │
+│  └──────────────────┘                                          │
+│         (29 edges with weights & mechanisms)                   │
+└────────────────────┬───────────────────────────────────────────┘
                      │ Graph Traversal + Consistency Check
                      v
 ┌────────────────────────────────────────────────────────────────┐
 │                    INFERENCE ENGINE                            │
-│  1. Trace observables ← intermediates ← root causes           │
-│  2. Score by: path_strength × consistency × severity          │
-│  3. Normalize to probabilities (sum = 1.0)                   │
-│  4. Confidence = evidence_quality × consistency               │
-└────────────────────┬────────────────────────────────────────────┘
+│  1. Trace observables ← intermediates ← root causes            │
+│  2. Score by: path_strength × consistency × severity           │
+│  3. Normalize to probabilities (sum = 1.0)                     │
+│  4. Confidence = evidence_quality × consistency                │
+└────────────────────┬───────────────────────────────────────────┘
                      v
 ┌────────────────────────────────────────────────────────────────┐
 │                    OUTPUT: RANKED HYPOTHESES                   │
-│  1. solar_degradation         P=46.3%  Confidence=93.3%       │
-│  2. battery_aging             P=18.8%  Confidence=71.7%       │
-│  3. battery_thermal           P=18.7%  Confidence=75.0%       │
+│  1. solar_degradation         P=46.3%  Confidence=93.3%        │
+│  2. battery_aging             P=18.8%  Confidence=71.7%        │
+│  3. battery_thermal           P=18.7%  Confidence=75.0%        │
 │     [+ mechanism & evidence for each]                          │
 └────────────────────────────────────────────────────────────────┘
 ```
