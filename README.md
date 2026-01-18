@@ -226,17 +226,17 @@ MEASUREMENT:
 ## Roadmap: Phases 3-4
 
 ### Phase 3: Expand Subsystems (Weeks 5-6)
-- [ ] Add thermal subsystem to causal graph
-- [ ] Update propagation paths (power ↔ thermal ↔ payload)
-- [ ] Multi-fault scenarios (e.g., thermal drift + solar degradation)
-- [ ] Improved telemetry plots and textual explanations
+- [ x ] Add thermal subsystem to causal graph
+- [ x ] Update propagation paths (power ↔ thermal ↔ payload)
+- [ x ] Multi-fault scenarios (e.g., thermal drift + solar degradation)
+- [ x ] Improved telemetry plots and textual explanations
 
 ### Phase 4: Experimental Validation (Weeks 7-8)
-- [ ] Benchmark: Correlation vs. rule-based vs. Bayesian reasoning
+- [ x ] Benchmark: Correlation vs. rule-based vs. Bayesian reasoning
   - *Metric:* Accuracy of root cause ranking
   - *Condition:* Vary missing data, noise levels, simultaneous faults
-- [ ] Paper-style report (ICRA/AIAA format)
-- [ ] Public GitHub repo with reproducible notebooks
+- [ x ] Paper-style report (ICRA/AIAA format)
+- [ x ] Public GitHub repo with reproducible notebooks
 
 ---
 
