@@ -1,6 +1,6 @@
 # Pravaha: Causal Inference for Multi-Fault Satellite Failures
 
-**A research-grade framework for inferring root causes in satellite systems experiencing multiple simultaneous degradations.**
+**A framework for inferring root causes in satellite systems experiencing multiple simultaneous degradations.**
 
 ## The Problem
 
