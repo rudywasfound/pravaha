@@ -8,6 +8,8 @@
 #/target
 
 rust_core/target/
+rust_core/target/debug/
+rust_core/target/release/
 __pycache__/
 casual_graph/__pycache__/
 gsat6a/__pycache__/
