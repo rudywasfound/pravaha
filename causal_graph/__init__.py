@@ -1,6 +1,7 @@
-"""Causal inference module for satellite fault diagnosis."""
+"""Causal graph framework for satellite fault diagnosis."""
 
 from causal_graph.graph_definition import CausalGraph, NodeType, Node, Edge
+from causal_graph.visualizer import DAGVisualizer
 from causal_graph.root_cause_ranking import RootCauseRanker, RootCauseHypothesis
 
 __all__ = [
@@ -8,6 +9,7 @@ __all__ = [
     "NodeType",
     "Node",
     "Edge",
+    "DAGVisualizer",
     "RootCauseRanker",
     "RootCauseHypothesis",
 ]

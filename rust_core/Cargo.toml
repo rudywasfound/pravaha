@@ -2,14 +2,55 @@
 name = "pravaha_core"
 version = "0.1.0"
 edition = "2021"
+description = "Satellite Telemetry State Estimation Framework"
+license = "Apache-2.0"
+repository = "https://github.com/rudywasfound/pravaha"
 
 [[bin]]
 name = "pravaha_core"
-path = "src/main.rs"
+path = "src/bin/main.rs"
 
 [lib]
 name = "pravaha_core"
 path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]  # Both dynamic lib (for Python) and static lib
 
 [dependencies]
+# Numerical computation
 nalgebra = "0.32"
+ndarray = "0.15"
+
+# Async runtime
+tokio = { version = "1.35", features = ["full"], optional = true }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Python FFI
+pyo3 = { version = "0.21", features = ["extension-module"], optional = true }
+
+# Logging
+log = "0.4"
+env_logger = "0.10"
+
+# Time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+[dev-dependencies]
+criterion = "0.5"  # Benchmarking
+
+[features]
+default = ["python", "async"]
+python = ["pyo3"]
+async = ["tokio"]
+wasm = []  # For wasm-pack compilation
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1

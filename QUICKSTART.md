@@ -3,21 +3,20 @@
 ## Installation
 
 ```bash
-cd /home/atix/pravaha
 python -m venv .venv
-source .venv/bin/activate
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-## Run
+## Run Full Analysis
 
 ```bash
 python main.py
 ```
 
-Simulates nominal and degraded satellite telemetry, builds causal graph, ranks root causes. Outputs console report and plots to `output/`.
+Simulates 24h of nominal and degraded satellite telemetry, detects deviations, ranks root causes. Output: plots + console report.
 
-## Test
+## Test Suite
 
 ```bash
 python -m unittest discover tests/ -v
@@ -25,36 +24,43 @@ python -m unittest discover tests/ -v
 
 Expected: 27 tests passing.
 
-## What It Does
+## Using the Causal Graph Framework
 
-1. Simulates 24 hours of power and thermal telemetry
-2. Detects observable deviations (>15% from nominal)
-3. Traces deviations through causal graph to root causes
-4. Scores hypotheses by path strength, consistency, severity
-5. Returns ranked causes with confidence and mechanisms
+```python
+from causal_graph import CausalGraph, DAGVisualizer
 
-## Modify Scenarios
+# Load graph and visualize
+graph = CausalGraph()
+viz = DAGVisualizer(graph)
+viz.save("dag.png")  # Outputs PNG image
 
-Edit fault parameters in `main.py`:
+# Analyze structure
+from causal_graph.dag_visualization import print_structure_by_type
+print_structure_by_type(graph)
+```
+
+## Customize Fault Scenarios
+
+Edit `main.py`:
 
 ```python
 power_deg = power_sim.run_degraded(
-    solar_degradation_hour=6.0,      # When fault occurs
-    solar_factor=0.7,                # Severity
+    solar_degradation_hour=6.0,   # When fault starts
+    solar_factor=0.7,              # Severity (0-1)
     battery_degradation_hour=8.0,
     battery_factor=0.8,
 )
 ```
 
-## Files
+## Key Modules
 
-- `simulator/power.py` - Power subsystem
-- `simulator/thermal.py` - Thermal subsystem
-- `causal_graph/graph_definition.py` - DAG
-- `causal_graph/root_cause_ranking.py` - Inference
-- `main.py` - Entry point
+| Module | Purpose |
+|--------|---------|
+| `causal_graph/graph_definition.py` | DAG: 23 nodes, 29 edges |
+| `causal_graph/visualizer.py` | Render graphs to PNG/PDF/SVG |
+| `causal_graph/root_cause_ranking.py` | Bayesian inference |
+| `simulator/power.py` | Power subsystem simulator |
+| `simulator/thermal.py` | Thermal subsystem simulator |
+| `main.py` | Full workflow orchestration |
 
-## Documentation
-
-- `README.md` - Full documentation
-- `PROJECT_STATUS.md` - Architecture details
+See `README.md` for detailed architecture.

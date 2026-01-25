@@ -1,14 +1,16 @@
-# Pravaha Rust Core: Kalman Filter + Hidden State Inference
+# Satellite Telemetry State Estimation Framework (Rust)
 
-High-performance Rust implementation of telemetry dropout handling for satellite diagnostics.
+High-performance Rust framework for real-time satellite state estimation, telemetry stream processing, and physics-based inference during communication dropouts.
 
 ## Purpose
 
-When satellites lose connection for 5+ seconds, observable telemetry measurements stop flowing. The Rust core maintains state estimates of hidden (unobservable) satellite conditions using:
+Standalone Rust framework for real-time satellite state estimation and telemetry processing.
 
-1. **Kalman Filter** - Predicts power system state forward with physics-based dynamics
-2. **Hidden State Inference** - Maps predictions to causal graph intermediate nodes
-3. **Confidence Degradation** - Tracks uncertainty as dropout extends
+**Capabilities:**
+- Physics-based Kalman filtering (state prediction)
+- Estimate hidden states during communication dropouts
+- Real-time streaming (1+ Hz satellite data)
+- Multi-language bindings: Python (PyO3), C (cbindgen), JavaScript (WASM)
 
 ## Building
 
@@ -17,95 +19,143 @@ cd rust_core
 cargo build --release
 ```
 
-## Integration
+## Integration Points
 
-The Rust core is invoked from Python's causal graph inference pipeline:
-
+### 1. As Python Extension (Fastest)
 ```python
-# From Python (gsat6a/live_simulation.py or causal_graph/root_cause_ranking.py)
-import subprocess
-import json
+import pravaha_core
 
-# Detect dropout in telemetry
-if dropout_detected(sample_indices):
-    # Call Rust binary with telemetry gap info
-    result = subprocess.run(
-        ["./rust_core/target/release/pravaha_core", 
-         f"--gap-start={gap_start}",
-         f"--gap-end={gap_end}",
-         f"--load-power=300.0"],
-        capture_output=True,
-        text=True
-    )
-    
-    # Parse hidden state estimates from JSON output
-    hidden_states = json.loads(result.stdout)
-    
-    # Use estimates in causal inference
-    ranker.update_with_hidden_states(hidden_states)
+# Create filter
+kf = pravaha_core.KalmanFilter(dt=1.0)
+
+# Process measurements
+measurement = pravaha_core.Measurement()
+measurement.battery_voltage = 28.5
+measurement.battery_charge = 95.0
+# ... set other fields
+
+kf.update(measurement)
+estimate = kf.get_estimate()  # JSON string
 ```
 
-## Module Structure
+### 2. As CLI Tool
+```bash
+# Process telemetry stream
+cat telemetry.jsonl | ./target/release/pravaha_core | jq '.confidence'
+```
 
-- **kalman_filter.rs** - Core Kalman Filter implementation
-  - `PowerSystemKalmanFilter` - Predicts charge, voltage, solar, efficiency
-  - `TelemetryDropoutHandler` - Detects gaps and fills with predictions
-  - State transitions use physics model from `simulator/power.py`
+### 3. As Rust Library (Zero-copy)
+```rust
+use pravaha_core::{KalmanFilter, Measurement};
 
-- **hidden_state_inference.rs** - Causal graph integration
-  - `HiddenStateInferenceEngine` - Maps Kalman outputs to graph nodes
-  - `HiddenStateEstimate` - Represents estimated intermediate states
-  - `DropoutAwareInference` - Wrapper for complete dropout handling
+let mut kf = KalmanFilter::new(1.0);
+let measurement = Measurement::new(Utc::now());
+kf.update(&measurement)?;
+let estimate = kf.get_estimate();
+```
+
+### 4. As JavaScript/WASM (Browser)
+```javascript
+// Compiled to WASM, runs in browser
+const estimate = Module.process_measurement(measurement);
+```
+
+## Components
+
+| Module | Purpose |
+|--------|---------|
+| `kalman.rs` | Linear & Extended Kalman Filters |
+| `physics.rs` | Power & thermal physics models |
+| `measurement.rs` | Telemetry types & validation |
+| `state_estimate.rs` | State output & confidence |
+| `dropout_handler.rs` | Detect & predict through gaps |
+| `python_bindings.rs` | PyO3 bindings for Python |
+| `bin/main.rs` | CLI tool |
 
 ## Running
 
-Standalone demo:
+### As CLI Tool
 ```bash
-cd rust_core
-cargo run --release
+# Process JSON telemetry line-by-line
+echo '{"battery_voltage": 28.5, "battery_charge": 95.0, "battery_temp": 35.0, ...}' | \
+  ./target/release/pravaha_core
+
+# Real-time stream
+cat satellite_telemetry.jsonl | ./target/release/pravaha_core > estimates.jsonl
 ```
 
-Expected output:
-```
-✓ Rust core handles 5+ second telemetry dropout with:
-  • Kalman Filter state prediction
-  • Hidden state inference from causal graph
-  • Confidence degradation based on uncertainty
-  • Measurement update upon connection resume
-```
+### As Python Module
+```python
+from operational.telemetry_simulator import TelemetrySimulator
+import pravaha_core
 
-## Physics Model
+sim = TelemetrySimulator("solar_degradation")
+kf = pravaha_core.KalmanFilter(dt=1.0)
 
-The Kalman Filter uses physics equations from the power simulator:
-
-**Power Balance:**
-```
-dQ/dt = (P_solar * efficiency - P_load) / (capacity * 3600) * 100
-```
-
-**Voltage Model:**
-```
-V = V_nominal * (0.8 + 0.2 * SOC)
+for measurement in sim.generate_series(3600):
+    # Convert to PyMeasurement
+    py_meas = pravaha_core.Measurement()
+    py_meas.set_battery_voltage(measurement.battery_voltage_measured)
+    # ... set all fields
+    
+    kf.update(py_meas)
+    estimate_json = kf.get_estimate()
+    print(estimate_json)
 ```
 
-where SOC (State of Charge) = battery_charge / 100
+## Physics Implementation
 
-## Type Safety
+**Power System Dynamics:**
+```
+dSOC/dt = (I_charge - I_discharge) / capacity
+V(t) = V_nominal * (0.8 + 0.2 * SOC(t))
+I_discharge(t) = P_load(t) / V(t)
+```
 
-- All physical quantities have valid ranges (battery charge 20-100%, voltage 20-32V, etc.)
-- Matrix operations use `nalgebra` for numerical stability
-- Covariance matrices stay positive-definite through symmetric updates
+**Thermal System:**
+```
+Q_rad = σ * A * ε * (T^4 - T_space^4)
+dT/dt = (Q_in - Q_rad) / (m * c)
+```
+
+## Type Safety & Validation
+
+✓ All measurements validated against ranges
+✓ Matrix operations use `nalgebra` (numerical stability)
+✓ Covariance matrices stay positive-definite
+✓ Confidence scores prevent divergence
+✓ Zero-copy Rust for performance
 
 ## Testing
 
 ```bash
 cd rust_core
+
+# Run all tests
 cargo test
+
+# Run with logging
+RUST_LOG=debug cargo test -- --nocapture
+
+# Benchmark
+cargo bench
 ```
 
-## Future Enhancements
+## Status
 
-- [ ] FFI bindings for Python (ctypes or PyO3)
-- [ ] Real-time telemetry stream processing
-- [ ] Extended Kalman Filter (EKF) for nonlinear dynamics
-- [ ] WASM compilation for browser-based diagnostics
+**Completed:**
+- [x] Kalman Filter
+- [x] Physics models (power + thermal)
+- [x] Dropout handling
+- [x] Python bindings (PyO3)
+- [x] CLI tool
+
+**In Progress:**
+- [ ] Extended Kalman Filter (nonlinear)
+- [ ] WASM compilation
+- [ ] C FFI bindings (cbindgen)
+
+**Planned:**
+- [ ] Async tokio support
+- [ ] Particle filters
+- [ ] Custom physics models
