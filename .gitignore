@@ -6,3 +6,9 @@
 # already existing elements were commented out
 
 #/target
+
+rust_core/target/
+__pycache__/
+casual_graph/__pycache__/
+gsat6a/__pycache__/
+forensics/__pycache__/
