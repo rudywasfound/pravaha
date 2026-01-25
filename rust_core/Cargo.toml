@@ -1,0 +1,15 @@
+[package]
+name = "pravaha_core"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "pravaha_core"
+path = "src/main.rs"
+
+[lib]
+name = "pravaha_core"
+path = "src/lib.rs"
+
+[dependencies]
+nalgebra = "0.32"

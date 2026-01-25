@@ -39,7 +39,7 @@ class RootCauseHypothesis:
     
     Operators use this information to:
     1. Know which fault is most likely (probability)
-    2. Understand why (mechanism, evidence)
+    2. Understand why (mechanism, evidence, causal paths)
     3. Know how confident to be (confidence score)
     """
     
@@ -48,6 +48,7 @@ class RootCauseHypothesis:
     evidence: List[str]         # Observable deviations supporting this hypothesis
     mechanism: str              # Explanation of causal mechanism
     confidence: float           # Confidence in this hypothesis (0-1, independent of probability)
+    causal_paths: List[List[str]] = None  # Causal chains from root cause to observables
 
 
 class RootCauseRanker:
@@ -125,22 +126,26 @@ class RootCauseRanker:
         # to find which root causes could have caused it
         root_cause_scores = {}  # Accumulates scores for each root cause
         root_cause_evidence = {}  # Tracks which observations support each hypothesis
+        root_cause_paths = {}  # Tracks causal paths for each root cause
 
         for observable, severity in anomalies.items():
             # Trace from this observable back to root causes
-            # Returns dict mapping root_cause_name -> score contribution
-            contributing_causes = self._trace_back_to_roots(
+            # Returns tuple of (scores_dict, paths_dict)
+            contributing_causes, cause_paths = self._trace_back_to_roots(
                 observable, severity, anomalies
             )
 
-            # Accumulate scores and evidence for each root cause
+            # Accumulate scores, evidence, and paths for each root cause
             for cause_name, cause_score in contributing_causes.items():
                 if cause_name not in root_cause_scores:
                     root_cause_scores[cause_name] = 0.0
                     root_cause_evidence[cause_name] = []
+                    root_cause_paths[cause_name] = []
 
                 root_cause_scores[cause_name] += cause_score
                 root_cause_evidence[cause_name].append(f"{observable} deviation")
+                if cause_name in cause_paths:
+                    root_cause_paths[cause_name].extend(cause_paths[cause_name])
 
         # STEP 3: RANKING
         # Normalize scores to probabilities and create hypothesis objects
@@ -169,14 +174,15 @@ class RootCauseRanker:
             )
 
             hypotheses.append(
-                RootCauseHypothesis(
-                    name=cause_name,
-                    probability=probability,
-                    evidence=root_cause_evidence[cause_name],
-                    mechanism=mechanism,
-                    confidence=confidence,
-                )
-            )
+                 RootCauseHypothesis(
+                     name=cause_name,
+                     probability=probability,
+                     evidence=root_cause_evidence[cause_name],
+                     mechanism=mechanism,
+                     confidence=confidence,
+                     causal_paths=root_cause_paths.get(cause_name, []),
+                 )
+             )
 
         # Sort by probability (highest first) for easy ranking
         hypotheses.sort(key=lambda h: h.probability, reverse=True)
@@ -256,7 +262,7 @@ class RootCauseRanker:
         observable: str,
         severity: float,
         anomalies: Dict[str, float],
-    ) -> Dict[str, float]:
+    ) -> tuple:
         """
         Trace from observable back to root causes.
 
@@ -271,7 +277,7 @@ class RootCauseRanker:
         Path 1: battery_voltage_measured ← battery_state ← solar_input ← solar_degradation
         Path 2: battery_voltage_measured ← battery_state ← battery_efficiency ← battery_aging
         
-        We score each path and root cause, then return the scores.
+        We score each path and root cause, then return both scores and paths.
 
         Args:
             observable: Name of observable that deviated (e.g., "battery_voltage")
@@ -279,7 +285,9 @@ class RootCauseRanker:
             anomalies: All detected anomalies (used for consistency checking)
 
         Returns:
-            Dict mapping root_cause_name -> score contribution (higher = stronger evidence)
+            Tuple of (scores_dict, paths_dict) where:
+            - scores_dict: maps root_cause_name -> score contribution
+            - paths_dict: maps root_cause_name -> list of contributing paths
         """
         
         # Convert observable name to graph node name
@@ -290,6 +298,7 @@ class RootCauseRanker:
         paths = self.graph.get_paths_to_root(observable_node)
 
         root_scores = {}
+        root_paths = {}  # Track which paths contribute to each root cause
 
         # Score each path and attribute to its root cause
         for path in paths:
@@ -298,6 +307,7 @@ class RootCauseRanker:
 
             if root_cause not in root_scores:
                 root_scores[root_cause] = 0.0
+                root_paths[root_cause] = []
 
             # STEP 1: Compute path strength
             # Product of all edge weights along the path
@@ -326,8 +336,9 @@ class RootCauseRanker:
             score = path_strength * severity * (0.5 + 0.5 * consistency)
 
             root_scores[root_cause] += score
+            root_paths[root_cause].append(path)  # Track contributing path
 
-        return root_scores
+        return root_scores, root_paths
 
     def _check_consistency(self, root_cause: str, anomalies: Dict[str, float]) -> float:
         """
@@ -520,10 +531,21 @@ class RootCauseRanker:
         print("DETAILED EXPLANATIONS:\n")
 
         for hyp in hypotheses:
-            print(f"• {hyp.name} (P={hyp.probability:.1%})")
-            print(f"  Evidence: {', '.join(hyp.evidence)}")
-            print(f"  Mechanism: {hyp.mechanism}")
-            print()
+             print(f"• {hyp.name} (P={hyp.probability:.1%})")
+             
+             # Display causal paths
+             if hyp.causal_paths:
+                 unique_paths = list(set([tuple(p) for p in hyp.causal_paths]))
+                 if len(unique_paths) > 0:
+                     print(f"  Causal Paths:")
+                     for path in unique_paths[:3]:  # Show up to 3 paths
+                         # Reverse path to show flow from root cause to observable
+                         path_str = " → ".join(reversed(path))
+                         print(f"    {path_str}")
+             
+             print(f"  Evidence: {', '.join(hyp.evidence)}")
+             print(f"  Mechanism: {hyp.mechanism}")
+             print()
 
         print("=" * 70 + "\n")
 
