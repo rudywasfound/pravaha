@@ -285,7 +285,7 @@ Thermal-electrical coupling:
 
 - See implementation: [simulator/power.py](../simulator/power.py)
 - See thermal model: [simulator/thermal.py](../simulator/thermal.py)
-- Understand inference: [Causal Graph](09_CAUSAL_GRAPH.md)
+- See real examples: [Real Examples](07_REAL_EXAMPLES.md)
 - Run it yourself: [Quick Start](03_QUICKSTART.md)
 
 ---

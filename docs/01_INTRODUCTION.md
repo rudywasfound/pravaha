@@ -278,9 +278,9 @@ Each document is self-contained and can be read independently, but they're also 
 
 1. **New to Aethelix?** -> Read [Quick Start](03_QUICKSTART.md)
 2. **Installing?** -> Read [Installation Guide](02_INSTALLATION.md)
-3. **Want details?** -> Read [Architecture](07_ARCHITECTURE.md)
-4. **Using as library?** -> Read [Python Library Usage](11_PYTHON_LIBRARY.md)
-5. **Deploying?** -> Read [Deployment Guide](16_DEPLOYMENT.md)
+3. **Want details?** -> Read [Real Examples](07_REAL_EXAMPLES.md)
+4. **Understanding physics?** -> Read [Physics Foundation](08_PHYSICS_FOUNDATION.md)
+5. **API reference?** -> Read [API Reference](10_API_REFERENCE.md)
 
 ---
 
