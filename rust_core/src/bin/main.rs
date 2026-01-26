@@ -1,13 +1,13 @@
 //! CLI binary for Satellite Telemetry State Estimation Framework
 
 use std::io::{self, BufRead};
-use pravaha_core::{Measurement, KalmanFilter, MeasurementValidator};
+use aethelix_core::{Measurement, KalmanFilter, MeasurementValidator};
 
 fn main() {
     env_logger::init();
     
     println!("═══════════════════════════════════════════════════════════");
-    println!("Satellite Telemetry State Estimation Framework v{}", pravaha_core::VERSION);
+    println!("Satellite Telemetry State Estimation Framework v{}", aethelix_core::VERSION);
     println!("═══════════════════════════════════════════════════════════\n");
 
     let mut kalman = KalmanFilter::new(1.0);

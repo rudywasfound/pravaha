@@ -2,14 +2,14 @@
 """
 Satellite Telemetry Simulator
 
-Generates realistic housekeeping measurements for testing Pravaha's
+Generates realistic housekeeping measurements for testing Aethelix's
 inference engine without needing real satellite data.
 
 Usage:
     sim = TelemetrySimulator(scenario="solar_degradation")
     for t in range(3600):
         measurements = sim.generate(timestamp=datetime.now())
-        # Feed to Pravaha inference
+        # Feed to Aethelix inference
 """
 
 import numpy as np

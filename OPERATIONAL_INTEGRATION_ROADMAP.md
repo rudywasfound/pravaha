@@ -1,6 +1,6 @@
 # Operational Integration Roadmap
 
-**Focus:** Connect Pravaha to real satellite operations  
+**Focus:** Connect Aethelix to real satellite operations  
 **Timeline:** 2-4 weeks for MVP  
 **Status:** Ready to begin
 
@@ -32,7 +32,7 @@
 
 ### 1.1 Create Telemetry Generator
 ```python
-# pravaha/telemetry_simulator.py
+# aethelix/telemetry_simulator.py
 
 class TelemetrySimulator:
     """Generate realistic satellite measurements for testing."""
@@ -67,7 +67,7 @@ scenarios/
 
 ### 1.3 Validation
 - Generate data for each scenario
-- Feed to Pravaha inference
+- Feed to Aethelix inference
 - Verify correct diagnosis
 - Plot telemetry over time
 
@@ -80,7 +80,7 @@ scenarios/
 
 ### 2.1 Telemetry Buffer
 ```python
-# pravaha/telemetry_buffer.py
+# aethelix/telemetry_buffer.py
 
 class MeasurementBuffer:
     """Rolling window of recent measurements."""
@@ -103,9 +103,9 @@ class MeasurementBuffer:
 
 ### 2.2 Diagnosis Service
 ```python
-# pravaha/inference_service.py
+# aethelix/inference_service.py
 
-class PravahaDiagnosisService:
+class AethelixDiagnosisService:
     """Continuous monitoring and root cause ranking."""
     
     def __init__(self, graph, buffer):
@@ -135,7 +135,7 @@ class PravahaDiagnosisService:
 
 ### 2.3 Alert System
 ```python
-# pravaha/alert_system.py
+# aethelix/alert_system.py
 
 class AlertManager:
     """Generate alerts when diagnosis changes."""
@@ -176,12 +176,12 @@ class AlertManager:
 
 ### 3.1 REST API
 ```python
-# pravaha/api.py
+# aethelix/api.py
 
 from flask import Flask, jsonify
 
 app = Flask(__name__)
-service = PravahaDiagnosisService(graph, buffer)
+service = AethelixDiagnosisService(graph, buffer)
 
 @app.route('/api/current-diagnosis')
 def get_current_diagnosis():
@@ -228,7 +228,7 @@ def get_measurements(lookback_seconds=3600):
 
 ### 3.2 Dashboard
 ```html
-<!-- pravaha/dashboard.html -->
+<!-- aethelix/dashboard.html -->
 
 <html>
 <body>
@@ -331,7 +331,7 @@ CREATE TABLE alerts (
 ```python
 # Post-incident analysis
 def analyze_incident(start_time, end_time):
-    """Reconstruct what Pravaha saw during incident."""
+    """Reconstruct what Aethelix saw during incident."""
     telemetry = query_measurements(start_time, end_time)
     diagnoses = query_diagnoses(start_time, end_time)
     
@@ -426,8 +426,8 @@ WEEK 4: Data Persistence
    - Go-live decision by mission lead
 
 4. **Integration Testing**
-   - Historical replay: run Pravaha on past telemetry
-   - Compare: Pravaha diagnosis vs. what actually happened
+   - Historical replay: run Aethelix on past telemetry
+   - Compare: Aethelix diagnosis vs. what actually happened
    - Quantify: lead time advantage vs. threshold-based alerts
 
 ---
@@ -448,7 +448,7 @@ WEEK 4: Data Persistence
 ## Files to Create
 
 ```
-pravaha/
+aethelix/
 ├─ operational/
 │  ├─ telemetry_simulator.py      (Phase 1)
 │  ├─ scenarios/
@@ -475,7 +475,7 @@ pravaha/
 
 **Immediate:**
 1. Create telemetry simulator with solar degradation scenario
-2. Verify Pravaha diagnoses it correctly (should find 100% solar_degradation)
+2. Verify Aethelix diagnoses it correctly (should find 100% solar_degradation)
 3. Create measurement buffer and inference service
 4. Run 1-hour simulation end-to-end
 
@@ -501,4 +501,4 @@ But this is **optimization**, not **required** for operations.
 **Status:** Ready to begin Phase 1  
 **Owner:** [Your team]  
 **Timeline:** 2-4 weeks to MVP  
-**Goal:** Get Pravaha running on real satellite by Q1 2026
+**Goal:** Get Aethelix running on real satellite by Q1 2026

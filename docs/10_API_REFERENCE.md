@@ -1,6 +1,6 @@
 # API Reference
 
-Complete reference for all Pravaha modules and functions.
+Complete reference for all Aethelix modules and functions.
 
 ## Overview
 

@@ -1,7 +1,7 @@
 """
 Extended Benchmark: causal inference vs correlation baseline.
 
-This module evaluates the performance of Pravaha's causal inference approach
+This module evaluates the performance of Aethelix's causal inference approach
 against a simpler correlation-based baseline. We test across multiple dimensions:
 - 12 diverse scenarios (fault severity, type, timing)
 - Fault severity robustness (how well each approach handles minor vs major faults)

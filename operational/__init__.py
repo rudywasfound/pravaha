@@ -1,5 +1,5 @@
 """
-Operational integration components for Pravaha.
+Operational integration components for Aethelix.
 
 Connects the causal inference engine to real satellite operations:
 - Telemetry ingestion and simulation

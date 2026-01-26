@@ -1,8 +1,8 @@
-# Pravaha Causal DAG: Complete Demonstration Report
+# Aethelix Causal DAG: Complete Demonstration Report
 
 ## Executive Summary
 
-This report demonstrates that **Pravaha is causal inference grounded in Pearl's framework**, not pattern matching or machine learning.
+This report demonstrates that **Aethelix is causal inference grounded in Pearl's framework**, not pattern matching or machine learning.
 
 **Three components prove this:**
 
@@ -237,7 +237,7 @@ ASSUMPTION VALIDATION
   sensor_bias_identifiable                 ✓ VALID
 
 ✓ All causal assumptions validated!
-  Pravaha can safely use d-separation for inference.
+  Aethelix can safely use d-separation for inference.
 ================================================================================
 ```
 
@@ -327,7 +327,7 @@ OBSERVABLES (MEASURED):
 
 ### Detection Timeline
 
-**Pravaha (Causal Inference):**
+**Aethelix (Causal Inference):**
 ```
 T+36 seconds:  ✓ Solar degradation detected
                Pattern: solar_input drop → battery_state drop → 
@@ -366,7 +366,7 @@ The DAG structure ensures:
 
 ### Comparison
 
-| Aspect | Thresholds | ML Pattern Matching | Causal DAG (Pravaha) |
+| Aspect | Thresholds | ML Pattern Matching | Causal DAG (Aethelix) |
 |--------|-----------|-------------------|----------------------|
 | **Knowledge** | Fixed limits | Learned from data | Domain expert encoded |
 | **Diagnosis** | Symptom ("low") | Anomaly score | Root cause ("solar") |
@@ -467,7 +467,7 @@ This demonstration proves:
 4. **Scientific Foundation**: Grounded in Pearl's published framework
 5. **Operational Value**: 36-90+ second early warning vs. threshold systems
 
-**Pravaha is causal inference, not pattern matching.**
+**Aethelix is causal inference, not pattern matching.**
 
 ---
  

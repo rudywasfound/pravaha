@@ -17,7 +17,7 @@ python gsat6a/live_simulation_main.py forensics
 The forensic analysis shows:
 
 ```
-CAUSAL INFERENCE (Pravaha)
+CAUSAL INFERENCE (Aethelix)
   Detection Time: T+X seconds
   Event: Solar degradation detected (YY% confidence)
 
@@ -26,12 +26,12 @@ TRADITIONAL THRESHOLDS
   Alert: Parameter dropped AA%
 
 LEAD TIME ADVANTAGE
-Pravaha detects failure (Z-X) seconds earlier
+Aethelix detects failure (Z-X) seconds earlier
 ```
 
 ## What This Proves
 
-**Metric**: Can Pravaha identify the Power Bus failure 30+ seconds earlier?
+**Metric**: Can Aethelix identify the Power Bus failure 30+ seconds earlier?
 
 ✓ **Yes** - The forensic module demonstrates that causal inference can:
 - Identify ROOT CAUSES (e.g., "solar degradation")
@@ -66,7 +66,7 @@ python gsat6a/live_simulation_main.py mission
 - Limited time for corrective action
 - By then, cascade failure may be unavoidable
 
-**Causal inference (Pravaha)**:
+**Causal inference (Aethelix)**:
 - Detects ROOT CAUSES from subtle patterns ("Solar degradation detected")
 - Immediately tells operators what failed
 - Provides 30-90+ seconds of early warning
@@ -75,7 +75,7 @@ python gsat6a/live_simulation_main.py mission
 
 ## Selling Point
 
-> **Pravaha gives you 36-90+ seconds to prevent mission failure**
+> **Aethelix gives you 36-90+ seconds to prevent mission failure**
 >
 > Instead of reacting when alarms trigger, you know the root cause and can take corrective action before cascading failure occurs.
 

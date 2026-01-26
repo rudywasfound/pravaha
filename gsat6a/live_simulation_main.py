@@ -26,7 +26,8 @@ def main():
         from forensics import GSAT6AForensics
         forensics = GSAT6AForensics()
         forensics.analyze()
-        forensics.print_failure_cascade()
+        forensics.print_analysis()
+        forensics.generate_graphs(output_dir=os.path.dirname(os.path.abspath(__file__)).rsplit('/', 1)[0])
         print("✓ Forensic analysis complete\n")
     
     elif mode == "simulation":

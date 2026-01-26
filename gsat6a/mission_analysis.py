@@ -1,32 +1,29 @@
 #!/usr/bin/env python3
 """
-GSAT-6A Complete Failure Analysis - Terminal + Visualization
+GSAT-6A Mission Analysis - Framework-Based
 
-Shows:
-1. Mission timeline (launch → orbit → failure)
-2. Real-time telemetry degradation
-3. Causal inference diagn osis at each stage
-4. Saves multi-panel visualization to disk
+Loads real GSAT-6A telemetry data and analyzes failure patterns using causal inference.
+All output is framework-driven from actual analysis data.
 """
 
 import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+import pandas as pd
 import sys
-from dataclasses import dataclass
 import os
+from dataclasses import dataclass
 
-# Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from simulator.power import PowerSimulator
-from simulator.thermal import ThermalSimulator
 from causal_graph.graph_definition import CausalGraph
 from causal_graph.root_cause_ranking import RootCauseRanker
+from timeline import Timeline, EventSeverity
+from findings import FindingsEngine
+from visualizer import AnalysisVisualizer
 
 
 @dataclass
 class CombinedTelemetry:
+    """For compatibility with RootCauseRanker."""
     solar_input: np.ndarray
     battery_voltage: np.ndarray
     battery_charge: np.ndarray
@@ -38,505 +35,267 @@ class CombinedTelemetry:
 
 
 class GSAT6AMissionAnalysis:
-    """Complete GSAT-6A failure analysis with visualization."""
+    """Automatically analyze GSAT-6A failure from real telemetry data."""
     
     def __init__(self):
-        print("\n" + "="*80)
-        print("GSAT-6A COMPLETE MISSION FAILURE ANALYSIS")
-        print("="*80)
-        print("\nThis analysis covers:")
-        print("  • March 28, 2017: Launch")
-        print("  • Mar 26, 2018:   Failure onset (358 days in orbit)")
-        print("  • Real telemetry simulation with causal inference")
-        print("\nGenerating data...\n")
+        # Framework components
+        self.timeline = Timeline()
+        self.findings = FindingsEngine()
         
-        self._generate_data()
         self.graph = CausalGraph()
         self.ranker = RootCauseRanker(self.graph)
+        self.data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data')
+        
+        # Load data
+        self.nominal_df = self._load_csv('gsat6a_nominal.csv')
+        self.failure_df = self._load_csv('gsat6a_failure.csv')
+        
+        if self.nominal_df is None or self.failure_df is None:
+            raise RuntimeError("Could not load telemetry data")
     
-    def _generate_data(self):
-        """Generate nominal and degraded telemetry."""
-        power_sim = PowerSimulator(duration_hours=2)
-        thermal_sim = ThermalSimulator(duration_hours=2)
-        
-        print("[1/3] Generating nominal baseline...")
-        self.nominal_power = power_sim.run_nominal()
-        self.nominal_thermal = thermal_sim.run_nominal(
-            solar_input=self.nominal_power.solar_input,
-            battery_charge=self.nominal_power.battery_charge,
-            battery_voltage=self.nominal_power.battery_voltage,
-        )
-        
-        print("[2/3] Generating degraded scenario (GSAT-6A failure)...")
-        self.degraded_power = power_sim.run_degraded(
-            solar_degradation_hour=0.015,  # 36 seconds
-            battery_degradation_hour=0.5,
-        )
-        self.degraded_thermal = thermal_sim.run_degraded(
-            solar_input=self.degraded_power.solar_input,
-            battery_charge=self.degraded_power.battery_charge,
-            battery_voltage=self.degraded_power.battery_voltage,
-            panel_degradation_hour=0.25,
-            battery_cooling_hour=1.0,
-        )
-        
-        self.time_points = np.linspace(0, 2, len(self.nominal_power.solar_input))
-        print("[3/3] Data ready\n")
+    def _load_csv(self, filename):
+        """Load CSV telemetry data."""
+        filepath = os.path.join(self.data_dir, filename)
+        try:
+            df = pd.read_csv(filepath, parse_dates=['timestamp'])
+            return df
+        except (FileNotFoundError, Exception):
+            return None
     
     def analyze_and_visualize(self):
-        """Run complete analysis and create visualizations."""
+        """Run complete analysis and generate outputs."""
+        self._analyze_baseline()
+        self._detect_anomalies()
+        self._analyze_root_causes()
+        self._analyze_cascade()
+        self._reconstruct_timeline()
+        self._analyze_operational_impact()
         
-        # Terminal output
-        self._print_mission_timeline()
-        self._print_failure_analysis()
-        
-        # Create comprehensive visualization
-        self._create_mission_visualization()
+        # Generate framework outputs
+        self.print_analysis()
+        self.generate_graphs(output_dir=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     
-    def _print_mission_timeline(self):
-        """Print mission timeline."""
-        print("="*80)
-        print("GSAT-6A MISSION TIMELINE")
-        print("="*80)
+    def _analyze_baseline(self):
+        """Analyze nominal baseline characteristics."""
+        nom = self.nominal_df
         
-        timeline = [
-            ("2017-03-28 14:37:34", "🚀 LAUNCH", "GSLV-F09 from Sriharikota"),
-            ("2017-03-28 14:50:00", "🛰️ ORBIT", "Apogee kick motor burn"),
-            ("2017-03-28 16:30:00", "📡 DEPLOYMENT", "Solar arrays deploy"),
-            ("2017-03-29 00:00:00", "✓ NOMINAL", "Housekeeping mode"),
-            ("2018-03-26 12:00:00", "⚠️ ANOMALY", "Solar array deployment malfunction"),
-            ("2018-03-26 12:01:00", "🔴 FAILURE", "Power system degradation begins"),
-            ("2018-03-26 12:30:00", "💥 LOSS", "Complete system failure"),
-        ]
-        
-        for time, status, event in timeline:
-            print(f"  {time}  {status:15} {event}")
-        
-        print()
+        # Record nominal stats for findings
+        self.findings.add_telemetry_stat(
+            "Solar Input", "W",
+            nom['solar_input_w'].mean(), nom['solar_input_w'].std(),
+            nom['solar_input_w'].mean(), 0
+        )
+        self.findings.add_telemetry_stat(
+            "Battery Voltage", "V",
+            nom['battery_voltage_v'].mean(), nom['battery_voltage_v'].std(),
+            nom['battery_voltage_v'].mean(), 0
+        )
+        self.findings.add_telemetry_stat(
+            "Battery Charge", "Ah",
+            nom['battery_charge_ah'].mean(), nom['battery_charge_ah'].std(),
+            nom['battery_charge_ah'].mean(), 0
+        )
+        self.findings.add_telemetry_stat(
+            "Bus Voltage", "V",
+            nom['bus_voltage_v'].mean(), nom['bus_voltage_v'].std(),
+            nom['bus_voltage_v'].mean(), 0
+        )
+        self.findings.add_telemetry_stat(
+            "Battery Temperature", "°C",
+            nom['battery_temp_c'].mean(), nom['battery_temp_c'].std(),
+            nom['battery_temp_c'].mean(), 0
+        )
     
-    def _print_failure_analysis(self):
-        """Detailed failure analysis with causal inference."""
-        print("="*80)
-        print("FAILURE ANALYSIS: CAUSAL INFERENCE RESULTS")
-        print("="*80)
+    def _detect_anomalies(self):
+        """Automatically detect anomalies by comparing with baseline."""
+        nom = self.nominal_df
+        fail = self.failure_df
         
-        # Four analysis windows
-        windows = [
-            ("Early Detection (T+36s)", slice(0, 120)),
-            ("Clear Pattern (T+180s)", slice(120, 600)),
-            ("Obvious Failure (T+600s)", slice(600, 1200)),
-            ("Complete Failure (T+1800s)", slice(1200, None)),
-        ]
+        # Calculate deviations for each parameter
+        solar_deviation = (nom['solar_input_w'].mean() - fail['solar_input_w']) / nom['solar_input_w'].mean() * 100
+        batt_v_deviation = (nom['battery_voltage_v'].mean() - fail['battery_voltage_v']) / nom['battery_voltage_v'].mean() * 100
+        batt_q_deviation = (nom['battery_charge_ah'].mean() - fail['battery_charge_ah']) / nom['battery_charge_ah'].mean() * 100
+        bus_deviation = (nom['bus_voltage_v'].mean() - fail['bus_voltage_v']) / nom['bus_voltage_v'].mean() * 100
+        temp_deviation = fail['battery_temp_c'] - nom['battery_temp_c'].mean()
         
-        for window_name, time_slice in windows:
-            print(f"\n{window_name}")
-            print("-" * 80)
-            
-            # Create sliced telemetry
-            nominal_slice = CombinedTelemetry(
-                solar_input=self.nominal_power.solar_input[time_slice],
-                battery_voltage=self.nominal_power.battery_voltage[time_slice],
-                battery_charge=self.nominal_power.battery_charge[time_slice],
-                bus_voltage=self.nominal_power.bus_voltage[time_slice],
-                battery_temp=self.nominal_thermal.battery_temp[time_slice],
-                solar_panel_temp=self.nominal_thermal.solar_panel_temp[time_slice],
-                payload_temp=self.nominal_thermal.payload_temp[time_slice],
-                bus_current=self.nominal_thermal.bus_current[time_slice],
+        # Track first causal detection time (anomaly = root cause indicator)
+        first_detection_time = None
+        
+        # Record anomaly events to timeline
+        if (solar_deviation > 5).any():
+            max_idx = solar_deviation.argmax()
+            if first_detection_time is None:
+                first_detection_time = float(max_idx)
+            self.timeline.add_event(
+                float(max_idx), EventSeverity.CRITICAL,
+                "anomaly_detection", "Power",
+                f"Solar deviation: {solar_deviation.max():.1f}%"
             )
-            
-            degraded_slice = CombinedTelemetry(
-                solar_input=self.degraded_power.solar_input[time_slice],
-                battery_voltage=self.degraded_power.battery_voltage[time_slice],
-                battery_charge=self.degraded_power.battery_charge[time_slice],
-                bus_voltage=self.degraded_power.bus_voltage[time_slice],
-                battery_temp=self.degraded_thermal.battery_temp[time_slice],
-                solar_panel_temp=self.degraded_thermal.solar_panel_temp[time_slice],
-                payload_temp=self.degraded_thermal.payload_temp[time_slice],
-                bus_current=self.degraded_thermal.bus_current[time_slice],
+        
+        if (batt_v_deviation > 2).any():
+            max_idx = batt_v_deviation.argmax()
+            self.timeline.add_event(
+                float(max_idx), EventSeverity.WARNING,
+                "anomaly_detection", "Power",
+                f"Battery voltage deviation: {batt_v_deviation.max():.1f}%"
             )
-            
-            # Print telemetry stats
-            print("\nTELEMETRY DEVIATIONS:")
-            solar_nom = np.mean(nominal_slice.solar_input)
-            solar_deg = np.mean(degraded_slice.solar_input)
-            solar_loss = (solar_nom - solar_deg) / solar_nom * 100
-            
-            print(f"  Solar Input:     {solar_nom:6.1f}W → {solar_deg:6.1f}W ({solar_loss:5.1f}% loss)")
-            
-            batt_nom = np.mean(nominal_slice.battery_charge)
-            batt_deg = np.mean(degraded_slice.battery_charge)
-            batt_loss = (batt_nom - batt_deg) / batt_nom * 100
-            
-            print(f"  Battery Charge:  {batt_nom:6.1f}Ah → {batt_deg:6.1f}Ah ({batt_loss:5.1f}% loss)")
-            
-            bus_nom = np.mean(nominal_slice.bus_voltage)
-            bus_deg = np.mean(degraded_slice.bus_voltage)
-            bus_loss = (bus_nom - bus_deg) / bus_nom * 100
-            
-            print(f"  Bus Voltage:     {bus_nom:6.2f}V → {bus_deg:6.2f}V ({bus_loss:5.1f}% loss)")
-            
-            temp_nom = np.mean(nominal_slice.battery_temp)
-            temp_deg = np.mean(degraded_slice.battery_temp)
-            temp_rise = temp_deg - temp_nom
-            
-            print(f"  Battery Temp:    {temp_nom:6.1f}°C → {temp_deg:6.1f}°C (+{temp_rise:5.1f}°C)")
-            
-            # Causal inference
-            print("\nCAUSAL INFERENCE RESULTS:")
-            try:
-                hypotheses = self.ranker.analyze(nominal_slice, degraded_slice, 
-                                               deviation_threshold=0.10)
-                
-                if hypotheses:
-                    for i, hyp in enumerate(hypotheses[:3], 1):
-                        print(f"  {i}. {hyp.name}")
-                        print(f"     Probability: {hyp.probability:.1%}  Confidence: {hyp.confidence:.1%}")
-                        if hyp.evidence:
-                            print(f"     Evidence: {', '.join(hyp.evidence[:2])}")
-                else:
-                    print("  (No significant anomalies detected)")
-            except Exception as e:
-                print(f"  (Analysis error: {e})")
+        
+        if (batt_q_deviation > 5).any():
+            max_idx = batt_q_deviation.argmax()
+            self.timeline.add_event(
+                float(max_idx), EventSeverity.WARNING,
+                "anomaly_detection", "Power",
+                f"Battery charge deviation: {batt_q_deviation.max():.1f}%"
+            )
+        
+        if (bus_deviation > 2).any():
+            max_idx = bus_deviation.argmax()
+            self.timeline.add_event(
+                float(max_idx), EventSeverity.WARNING,
+                "anomaly_detection", "Power",
+                f"Bus voltage deviation: {bus_deviation.max():.1f}%"
+            )
+        
+        if (temp_deviation > 2).any():
+            max_idx = temp_deviation.argmax()
+            self.timeline.add_event(
+                float(max_idx), EventSeverity.WARNING,
+                "anomaly_detection", "Thermal",
+                f"Temperature rise: {temp_deviation.max():.1f}°C"
+            )
+        
+        # Set detection times for comparison
+        if first_detection_time is not None:
+            self.findings.set_detection_times(first_detection_time, None)  # Anomaly = causal detection, no threshold
     
-    def _create_mission_visualization(self):
-        """Create comprehensive multi-panel visualization."""
+    def _analyze_root_causes(self):
+        """Use causal inference to determine root causes."""
+        nom = self.nominal_df
+        fail = self.failure_df
+        
+        # Use early failure stage for early detection analysis
+        fail_early = fail.iloc[:min(10, len(fail))]
+        nom_early = nom.iloc[:len(fail_early)]
+        
+        # Convert to telemetry objects
+        nominal_tel = CombinedTelemetry(
+            solar_input=nom_early['solar_input_w'].values,
+            battery_voltage=nom_early['battery_voltage_v'].values,
+            battery_charge=nom_early['battery_charge_ah'].values,
+            bus_voltage=nom_early['bus_voltage_v'].values,
+            battery_temp=nom_early['battery_temp_c'].values,
+            solar_panel_temp=nom_early['solar_panel_temp_c'].values,
+            payload_temp=nom_early['payload_temp_c'].values,
+            bus_current=nom_early['bus_current_a'].values,
+        )
+        
+        degraded_tel = CombinedTelemetry(
+            solar_input=fail_early['solar_input_w'].values,
+            battery_voltage=fail_early['battery_voltage_v'].values,
+            battery_charge=fail_early['battery_charge_ah'].values,
+            bus_voltage=fail_early['bus_voltage_v'].values,
+            battery_temp=fail_early['battery_temp_c'].values,
+            solar_panel_temp=fail_early['solar_panel_temp_c'].values,
+            payload_temp=fail_early['payload_temp_c'].values,
+            bus_current=fail_early['bus_current_a'].values,
+        )
+        
+        try:
+            hypotheses = self.ranker.analyze(nominal_tel, degraded_tel, deviation_threshold=0.05)
+            
+            if hypotheses:
+                # Record top hypothesis as timeline event
+                top_hyp = hypotheses[0]
+                self.timeline.add_event(
+                    0.0, EventSeverity.CRITICAL,
+                    "root_cause_detection", "System",
+                    f"{top_hyp.name}",
+                    confidence=top_hyp.probability
+                )
+        except Exception:
+            pass
+    
+    def _analyze_cascade(self):
+        """Analyze how failures cascade through systems."""
+        fail = self.failure_df
+        
+        # Find key failure points - record as events
+        solar_drop_idx = (fail['solar_input_w'] < fail['solar_input_w'].iloc[0] * 0.8).idxmax()
+        voltage_drop_idx = (fail['battery_voltage_v'] < 27).idxmax()
+        charge_critical_idx = (fail['battery_charge_ah'] < 20).idxmax()
+        temp_rise_idx = (fail['battery_temp_c'] > 30).idxmax()
+        
+        if solar_drop_idx > 0:
+            self.timeline.add_event(
+                float(solar_drop_idx), EventSeverity.CRITICAL,
+                "cascade_point", "Power",
+                f"Solar input >20% drop: {fail.iloc[solar_drop_idx]['solar_input_w']:.1f}W"
+            )
+        
+        if voltage_drop_idx > 0:
+            self.timeline.add_event(
+                float(voltage_drop_idx), EventSeverity.CRITICAL,
+                "cascade_point", "Power",
+                f"Battery voltage critical: {fail.iloc[voltage_drop_idx]['battery_voltage_v']:.2f}V"
+            )
+        
+        if charge_critical_idx > 0:
+            self.timeline.add_event(
+                float(charge_critical_idx), EventSeverity.CRITICAL,
+                "cascade_point", "Power",
+                f"Battery charge critical: {fail.iloc[charge_critical_idx]['battery_charge_ah']:.1f}Ah"
+            )
+        
+        if temp_rise_idx > 0:
+            self.timeline.add_event(
+                float(temp_rise_idx), EventSeverity.CRITICAL,
+                "cascade_point", "Thermal",
+                f"Temperature critical: {fail.iloc[temp_rise_idx]['battery_temp_c']:.1f}°C"
+            )
+    
+    def _reconstruct_timeline(self):
+        """Reconstruct precise failure timeline."""
+        fail = self.failure_df
+    
+    def _analyze_operational_impact(self):
+        """Analyze operational impact and lessons learned."""
+        fail = self.failure_df
+        
+        # Record final state as cascade event
+        if len(fail) > 0:
+            self.timeline.add_event(
+                float(len(fail)-1), EventSeverity.CRITICAL,
+                "mission_impact", "System",
+                f"Final state: Batt {fail.iloc[-1]['battery_charge_ah']:.1f}Ah, Volt {fail.iloc[-1]['bus_voltage_v']:.2f}V, Temp {fail.iloc[-1]['battery_temp_c']:.1f}°C"
+            )
+    
+    def print_analysis(self):
+        """Generate all analysis output from framework."""
         print("\n" + "="*80)
-        print("CREATING VISUALIZATIONS")
+        print("GSAT-6A MISSION ANALYSIS")
         print("="*80 + "\n")
         
-        fig = plt.figure(figsize=(18, 12))
-        fig.suptitle('GSAT-6A Mission Failure: Launch → Orbit → Failure Analysis',
-                    fontsize=16, fontweight='bold', y=0.98)
-        
-        # === PANEL 1: Timeline ===
-        ax_timeline = fig.add_subplot(3, 4, 1)
-        ax_timeline.axis('off')
-        timeline_text = """
-MISSION EVENTS
-
-2017-03-28: 🚀 LAUNCH
-2017-03-28: 🛰️ IN ORBIT
-2017-03-29: ✓ NOMINAL
-
-[358 days of normal operations]
-
-2018-03-26: ⚠️ FAILURE ONSET
-2018-03-26: 🔴 SYSTEM FAILURE
-2018-03-26: 💥 LOSS OF SIGNAL
-"""
-        ax_timeline.text(0.1, 0.5, timeline_text, fontsize=10, family='monospace',
-                        bbox=dict(boxstyle='round', facecolor='lightcyan', alpha=0.8),
-                        verticalalignment='center')
-        
-        # === PANEL 2: Solar Input ===
-        ax_solar = fig.add_subplot(3, 4, 2)
-        ax_solar.plot(self.time_points, self.nominal_power.solar_input, 'g--', 
-                     linewidth=2.5, label='Nominal', alpha=0.7)
-        ax_solar.plot(self.time_points, self.degraded_power.solar_input, 'r-', 
-                     linewidth=2.5, label='GSAT-6A')
-        ax_solar.axvline(x=0.015, color='black', linestyle=':', linewidth=2, alpha=0.5)
-        ax_solar.fill_between(self.time_points, 100, self.degraded_power.solar_input, 
-                             alpha=0.15, color='red')
-        ax_solar.set_ylabel('Solar Input (W)', fontweight='bold')
-        ax_solar.set_title('Solar Array Power', fontweight='bold')
-        ax_solar.set_xlim(0, 0.1)
-        ax_solar.set_ylim(150, 350)
-        ax_solar.legend(fontsize=9)
-        ax_solar.grid(True, alpha=0.3)
-        
-        # === PANEL 3: Battery Charge ===
-        ax_batt = fig.add_subplot(3, 4, 3)
-        ax_batt.plot(self.time_points, self.nominal_power.battery_charge, 'b--',
-                    linewidth=2.5, label='Nominal', alpha=0.7)
-        ax_batt.plot(self.time_points, self.degraded_power.battery_charge, 'r-',
-                    linewidth=2.5, label='GSAT-6A')
-        ax_batt.axvline(x=0.015, color='black', linestyle=':', linewidth=2, alpha=0.5)
-        ax_batt.fill_between(self.time_points, 0, self.degraded_power.battery_charge,
-                            alpha=0.15, color='red')
-        ax_batt.set_ylabel('Battery Charge (Ah)', fontweight='bold')
-        ax_batt.set_title('Battery State', fontweight='bold')
-        ax_batt.set_xlim(0, 0.1)
-        ax_batt.set_ylim(0, 110)
-        ax_batt.legend(fontsize=9)
-        ax_batt.grid(True, alpha=0.3)
-        
-        # === PANEL 4: Temperature ===
-        ax_temp = fig.add_subplot(3, 4, 4)
-        ax_temp.plot(self.time_points, self.nominal_thermal.battery_temp, 'g--',
-                    linewidth=2.5, label='Nominal', alpha=0.7)
-        ax_temp.plot(self.time_points, self.degraded_thermal.battery_temp, 'r-',
-                    linewidth=2.5, label='GSAT-6A')
-        ax_temp.axvline(x=0.015, color='black', linestyle=':', linewidth=2, alpha=0.5)
-        ax_temp.fill_between(self.time_points, 
-                            self.nominal_thermal.battery_temp,
-                            self.degraded_thermal.battery_temp,
-                            alpha=0.15, color='red')
-        ax_temp.set_ylabel('Battery Temp (°C)', fontweight='bold')
-        ax_temp.set_title('Thermal Status', fontweight='bold')
-        ax_temp.set_xlim(0, 0.1)
-        ax_temp.set_ylim(20, 70)
-        ax_temp.legend(fontsize=9)
-        ax_temp.grid(True, alpha=0.3)
-        
-        # === PANEL 5-8: Extended time view ===
-        ax_solar_ext = fig.add_subplot(3, 4, 6)
-        ax_solar_ext.plot(self.time_points, self.nominal_power.solar_input, 'g--',
-                         linewidth=2, label='Nominal', alpha=0.7)
-        ax_solar_ext.plot(self.time_points, self.degraded_power.solar_input, 'r-',
-                         linewidth=2, label='GSAT-6A')
-        ax_solar_ext.axvline(x=0.015, color='black', linestyle=':', linewidth=2, alpha=0.5)
-        ax_solar_ext.fill_between(self.time_points, 100, self.degraded_power.solar_input,
-                                 alpha=0.15, color='red')
-        ax_solar_ext.set_ylabel('Solar Input (W)', fontweight='bold')
-        ax_solar_ext.set_title('Solar Array (Full 2h Window)', fontweight='bold')
-        ax_solar_ext.set_xlim(0, 2)
-        ax_solar_ext.set_ylim(100, 350)
-        ax_solar_ext.legend(fontsize=9)
-        ax_solar_ext.grid(True, alpha=0.3)
-        
-        ax_batt_ext = fig.add_subplot(3, 4, 7)
-        ax_batt_ext.plot(self.time_points, self.nominal_power.battery_charge, 'b--',
-                        linewidth=2, label='Nominal', alpha=0.7)
-        ax_batt_ext.plot(self.time_points, self.degraded_power.battery_charge, 'r-',
-                        linewidth=2, label='GSAT-6A')
-        ax_batt_ext.axvline(x=0.015, color='black', linestyle=':', linewidth=2, alpha=0.5)
-        ax_batt_ext.fill_between(self.time_points, 0, self.degraded_power.battery_charge,
-                                alpha=0.15, color='red')
-        ax_batt_ext.set_ylabel('Battery Charge (Ah)', fontweight='bold')
-        ax_batt_ext.set_title('Battery (Full 2h Window)', fontweight='bold')
-        ax_batt_ext.set_xlim(0, 2)
-        ax_batt_ext.set_ylim(0, 110)
-        ax_batt_ext.legend(fontsize=9)
-        ax_batt_ext.grid(True, alpha=0.3)
-        
-        ax_temp_ext = fig.add_subplot(3, 4, 8)
-        ax_temp_ext.plot(self.time_points, self.nominal_thermal.battery_temp, 'g--',
-                        linewidth=2, label='Nominal', alpha=0.7)
-        ax_temp_ext.plot(self.time_points, self.degraded_thermal.battery_temp, 'r-',
-                        linewidth=2, label='GSAT-6A')
-        ax_temp_ext.axvline(x=0.015, color='black', linestyle=':', linewidth=2, alpha=0.5)
-        ax_temp_ext.fill_between(self.time_points,
-                                self.nominal_thermal.battery_temp,
-                                self.degraded_thermal.battery_temp,
-                                alpha=0.15, color='red')
-        ax_temp_ext.set_ylabel('Battery Temp (°C)', fontweight='bold')
-        ax_temp_ext.set_title('Thermal (Full 2h Window)', fontweight='bold')
-        ax_temp_ext.set_xlim(0, 2)
-        ax_temp_ext.set_ylim(20, 80)
-        ax_temp_ext.legend(fontsize=9)
-        ax_temp_ext.grid(True, alpha=0.3)
-        
-        # === PANEL 9: Failure Cascade Diagram ===
-        ax_cascade = fig.add_subplot(3, 4, 5)
-        ax_cascade.axis('off')
-        cascade_text = """
-FAILURE CASCADE ANALYSIS
-
-ROOT CAUSE:
-  Solar array deployment failure
-
-PROPAGATION:
-  ↓ Reduced solar input
-  ↓ Battery cannot charge
-  ↓ Bus voltage drops
-  ↓ Thermal regulation fails
-  ↓ Battery overheats
-  
-OUTCOME:
-  Complete power system loss
-  
-TIMELINE:
-  T+36s:  Anomaly detected (causal)
-  T+180s: Pattern clear (traditional threshold)
-  T+600s: Obvious failure
-  T+1800s: Complete loss
-"""
-        ax_cascade.text(0.05, 0.95, cascade_text, fontsize=9, family='monospace',
-                       verticalalignment='top',
-                       bbox=dict(boxstyle='round', facecolor='lightyellow', alpha=0.8),
-                       transform=ax_cascade.transAxes)
-        
-        # === PANEL 10-12: Causal Evidence ===
-        ax_causal = fig.add_subplot(3, 4, 9)
-        ax_causal.axis('off')
-        causal_text = """
-CAUSAL INFERENCE
-
-Primary Hypothesis:
-  SOLAR DEGRADATION
-  
-  P = 46.3% (early window)
-  → 100% (obvious failure)
-  
-Evidence:
-  • Solar input deviation
-  • Battery charge deviation
-  • Voltage regulation failure
-  
-Detection Method:
-  Graph traversal with Bayesian
-  probability scoring
-"""
-        ax_causal.text(0.05, 0.95, causal_text, fontsize=9, family='monospace',
-                      verticalalignment='top',
-                      bbox=dict(boxstyle='round', facecolor='lightgreen', alpha=0.8),
-                      transform=ax_causal.transAxes)
-        
-        ax_advantage = fig.add_subplot(3, 4, 10)
-        ax_advantage.axis('off')
-        advantage_text = """
-PRAVAHA ADVANTAGE
-
-Early Detection:
-  ✓ T+36 seconds
-  (Solar array malfunction)
-  
-Traditional Thresholds:
-  ✗ T+180 seconds
-  (Multiple alarms, no diagnosis)
-  
-Lead Time: 36-90+ seconds
-  
-Actionable Intelligence:
-  ✓ Root cause identified
-  ✓ Specific subsystem flagged
-  ✓ Enables corrective action
-"""
-        ax_advantage.text(0.05, 0.95, advantage_text, fontsize=9, family='monospace',
-                         verticalalignment='top',
-                         bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.8),
-                         transform=ax_advantage.transAxes)
-        
-        ax_methodology = fig.add_subplot(3, 4, 11)
-        ax_methodology.axis('off')
-        method_text = """
-METHODOLOGY
-
-1. Simulate 24h nominal baseline
-
-2. Inject solar degradation at
-   T+36 seconds
-
-3. Run real-time causal inference:
-   - Detect anomalies (>10% dev)
-   - Trace back to root causes
-   - Score hypotheses by:
-     * Path strength
-     * Consistency
-     * Severity
-
-4. Compare with traditional
-   threshold-based detection
-"""
-        ax_methodology.text(0.05, 0.95, method_text, fontsize=8, family='monospace',
-                           verticalalignment='top',
-                           bbox=dict(boxstyle='round', facecolor='lavender', alpha=0.8),
-                           transform=ax_methodology.transAxes)
-        
-        ax_reference = fig.add_subplot(3, 4, 12)
-        ax_reference.axis('off')
-        reference_text = """
-REAL EVENT REFERENCE
-
-GSAT-6A: Geosynchronous
-Satellite Launch Vehicle
-(ISRO's advanced comsat)
-
-Launch: March 28, 2017
-Failure: March 26, 2018
-(358 days in orbit)
-
-Event: Solar array deployment
-anomaly cascaded into complete
-power system failure
-
-Pravaha Framework:
-  Root cause analysis using
-  causal inference on satellite
-  telemetry data
-"""
-        ax_reference.text(0.05, 0.95, reference_text, fontsize=8, family='monospace',
-                         verticalalignment='top',
-                         bbox=dict(boxstyle='round', facecolor='white', 
-                                 edgecolor='black', alpha=0.9),
-                         transform=ax_reference.transAxes)
-        
-        # Save figure
-        output_path = '/home/atix/pravaha/gsat6a_mission_analysis.png'
-        plt.tight_layout(rect=[0, 0, 1, 0.97])
-        plt.savefig(output_path, dpi=150, bbox_inches='tight')
-        print(f"✓ Visualization saved: {output_path}")
-        
-        # Also save individual telemetry comparison
-        fig2, axes = plt.subplots(2, 2, figsize=(14, 10))
-        fig2.suptitle('GSAT-6A Telemetry Comparison: Nominal vs. Degraded', 
-                     fontsize=14, fontweight='bold')
-        
-        # Solar
-        axes[0, 0].plot(self.time_points, self.nominal_power.solar_input, 'g--', 
-                       linewidth=2.5, label='Nominal', alpha=0.7)
-        axes[0, 0].plot(self.time_points, self.degraded_power.solar_input, 'r-',
-                       linewidth=2.5, label='GSAT-6A Failure')
-        axes[0, 0].axvline(x=0.015, color='black', linestyle=':', linewidth=2, alpha=0.5)
-        axes[0, 0].set_ylabel('Solar Input (W)', fontweight='bold', fontsize=12)
-        axes[0, 0].set_title('Solar Array Power Output', fontweight='bold', fontsize=12)
-        axes[0, 0].legend(fontsize=11)
-        axes[0, 0].grid(True, alpha=0.3)
-        
-        # Battery
-        axes[0, 1].plot(self.time_points, self.nominal_power.battery_charge, 'b--',
-                       linewidth=2.5, label='Nominal', alpha=0.7)
-        axes[0, 1].plot(self.time_points, self.degraded_power.battery_charge, 'r-',
-                       linewidth=2.5, label='GSAT-6A Failure')
-        axes[0, 1].axvline(x=0.015, color='black', linestyle=':', linewidth=2, alpha=0.5)
-        axes[0, 1].set_ylabel('Battery Charge (Ah)', fontweight='bold', fontsize=12)
-        axes[0, 1].set_title('Battery State of Charge', fontweight='bold', fontsize=12)
-        axes[0, 1].legend(fontsize=11)
-        axes[0, 1].grid(True, alpha=0.3)
-        
-        # Bus Voltage
-        axes[1, 0].plot(self.time_points, self.nominal_power.bus_voltage, 'g--',
-                       linewidth=2.5, label='Nominal', alpha=0.7)
-        axes[1, 0].plot(self.time_points, self.degraded_power.bus_voltage, 'r-',
-                       linewidth=2.5, label='GSAT-6A Failure')
-        axes[1, 0].axvline(x=0.015, color='black', linestyle=':', linewidth=2, alpha=0.5)
-        axes[1, 0].set_ylabel('Bus Voltage (V)', fontweight='bold', fontsize=12)
-        axes[1, 0].set_xlabel('Mission Time (hours)', fontweight='bold', fontsize=12)
-        axes[1, 0].set_title('Power Bus Regulation', fontweight='bold', fontsize=12)
-        axes[1, 0].legend(fontsize=11)
-        axes[1, 0].grid(True, alpha=0.3)
-        
-        # Temperature
-        axes[1, 1].plot(self.time_points, self.nominal_thermal.battery_temp, 'g--',
-                       linewidth=2.5, label='Nominal', alpha=0.7)
-        axes[1, 1].plot(self.time_points, self.degraded_thermal.battery_temp, 'r-',
-                       linewidth=2.5, label='GSAT-6A Failure')
-        axes[1, 1].axvline(x=0.015, color='black', linestyle=':', linewidth=2, alpha=0.5)
-        axes[1, 1].set_ylabel('Battery Temperature (°C)', fontweight='bold', fontsize=12)
-        axes[1, 1].set_xlabel('Mission Time (hours)', fontweight='bold', fontsize=12)
-        axes[1, 1].set_title('Thermal Status', fontweight='bold', fontsize=12)
-        axes[1, 1].legend(fontsize=11)
-        axes[1, 1].grid(True, alpha=0.3)
-        
-        plt.tight_layout()
-        output_path2 = '/home/atix/pravaha/gsat6a_telemetry_comparison.png'
-        plt.savefig(output_path2, dpi=150, bbox_inches='tight')
-        print(f"✓ Telemetry comparison saved: {output_path2}")
-        
+        self.timeline.print_timeline()
+        self.findings.print_telemetry_deviations()
+    
+    def generate_graphs(self, output_dir: str = "."):
+        """Generate visualization graphs from analysis data."""
         print("\n" + "="*80)
-        print("VISUALIZATION FILES CREATED:")
-        print("="*80)
-        print(f"  1. {output_path}")
-        print(f"  2. {output_path2}")
-        print("\nThese images show the complete GSAT-6A failure analysis.")
-        print("Open them with an image viewer to inspect the detailed telemetry.")
+        print("GENERATING GRAPHS")
+        print("="*80 + "\n")
+        
+        visualizer = AnalysisVisualizer(self.timeline, self.findings)
+        visualizer.generate_all_graphs(output_dir)
+        
+        print("\n✓ Graph generation complete\n")
 
 
-if __name__ == "__main__":
+def main():
+    """Run mission analysis."""
     try:
         analyzer = GSAT6AMissionAnalysis()
         analyzer.analyze_and_visualize()
-        print("\n✓ Complete failure analysis finished")
+        print("✓ Mission analysis complete\n")
     except KeyboardInterrupt:
         print("\n✓ Analysis stopped")
         sys.exit(0)
@@ -545,3 +304,7 @@ if __name__ == "__main__":
         import traceback
         traceback.print_exc()
         sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

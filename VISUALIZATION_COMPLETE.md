@@ -8,10 +8,10 @@
 
 ## What Was Delivered
 
-An **interactive web-based visualization** of the Pravaha causal DAG that operators can use to:
+An **interactive web-based visualization** of the Aethelix causal DAG that operators can use to:
 - Understand failure propagation paths
 - Diagnose root causes from symptoms
-- Validate Pravaha's recommendations
+- Validate Aethelix's recommendations
 - Learn the causal structure
 
 ---
@@ -19,7 +19,7 @@ An **interactive web-based visualization** of the Pravaha causal DAG that operat
 ## Quick Start (2 Minutes)
 
 ```bash
-cd /path/to/pravaha
+cd /path/to/aethelix
 
 # Generate the interactive visualization
 python causal_graph/interactive_dag_viz.py
@@ -109,9 +109,9 @@ The interactive visualization itself:
 3. See which root causes (red stars) could explain all of them
 4. Read edge mechanisms to understand the cascade
 
-### Scenario 3: Understand Pravaha's Diagnosis
+### Scenario 3: Understand Aethelix's Diagnosis
 
-1. Pravaha says: "Solar degradation (98% probability)"
+1. Aethelix says: "Solar degradation (98% probability)"
 2. Open visualization
 3. Find `solar_degradation` (red star, top-left)
 4. Follow the paths downward to observables
@@ -206,7 +206,7 @@ The visualization shows you the complete DAG:
 
 ---
 
-## Integration with Pravaha
+## Integration with Aethelix
 
 This visualization works with:
 
@@ -215,11 +215,11 @@ This visualization works with:
 3. **d_separation.py** - Validation of causal assumptions
 4. **GSAT-6A forensics** - Real-world case study
 
-When Pravaha recommends a diagnosis, you can:
+When Aethelix recommends a diagnosis, you can:
 1. Open the visualization
 2. Find the recommended root cause
 3. Trace the causal paths to your observed deviations
-4. Verify Pravaha's reasoning
+4. Verify Aethelix's reasoning
 
 ---
 
@@ -297,7 +297,7 @@ A: Find the deviating measurement (blue circle), trace backward to root causes (
    - INTERACTIVE_GUIDE.md (10 min)
 
 5. **Use it for diagnostics:**
-   - When Pravaha gives a diagnosis
+   - When Aethelix gives a diagnosis
    - When you need to understand a failure
    - When training new operators
 
@@ -317,7 +317,7 @@ A: Find the deviating measurement (blue circle), trace backward to root causes (
 
 With this visualization, operators can:
 
-✓ **Understand** why Pravaha makes a diagnosis  
+✓ **Understand** why Aethelix makes a diagnosis  
 ✓ **Verify** recommendations against causal logic  
 ✓ **Educate** themselves on satellite failure modes  
 ✓ **Train** new operators on system dependencies  
@@ -344,4 +344,4 @@ With this visualization, operators can:
 **Status:** ✅ Complete and Ready for Operations  
 **Generated:** January 25, 2026  
 **For:** Operators, supervisors, analysts  
-**Questions?** See the documentation files or contact the Pravaha team
+**Questions?** See the documentation files or contact the Aethelix team

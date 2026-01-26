@@ -1,17 +1,17 @@
 [package]
-name = "pravaha_core"
+name = "aethelix_core"
 version = "0.1.0"
 edition = "2021"
 description = "Satellite Telemetry State Estimation Framework"
 license = "Apache-2.0"
-repository = "https://github.com/rudywasfound/pravaha"
+repository = "https://github.com/rudywasfound/aethelix"
 
 [[bin]]
-name = "pravaha_core"
+name = "aethelix_core"
 path = "src/bin/main.rs"
 
 [lib]
-name = "pravaha_core"
+name = "aethelix_core"
 path = "src/lib.rs"
 crate-type = ["cdylib", "rlib"]  # Both dynamic lib (for Python) and static lib
 

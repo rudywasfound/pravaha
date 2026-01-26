@@ -1,6 +1,6 @@
 # Understanding Output
 
-Complete guide to interpreting Pravaha's reports, visualizations, and confidence scores.
+Complete guide to interpreting Aethelix's reports, visualizations, and confidence scores.
 
 ## Report Output Example
 

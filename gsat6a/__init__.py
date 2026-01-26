@@ -1,7 +1,7 @@
 """
 GSAT-6A Failure Analysis Module
 
-Demonstrates Pravaha's capability to diagnose the actual GSAT-6A
+Demonstrates Aethelix's capability to diagnose the actual GSAT-6A
 failure from March 26, 2018 using real-time telemetry simulation.
 
 Usage:

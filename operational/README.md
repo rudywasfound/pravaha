@@ -1,6 +1,6 @@
 # Operational Integration: From Lab to Real Satellites
 
-This module transforms Pravaha from a research tool into an operational diagnostic system for real satellites.
+This module transforms Aethelix from a research tool into an operational diagnostic system for real satellites.
 
 ## Current Status
 
@@ -33,7 +33,7 @@ sim = TelemetrySimulator(scenario="solar_degradation")
 # Generate 1 hour of telemetry
 for measurement in sim.generate_series(duration_seconds=3600):
     print(measurement.battery_voltage_measured)
-    # Feed to Pravaha inference
+    # Feed to Aethelix inference
 ```
 
 **Test It:**
@@ -61,7 +61,7 @@ Data Ingestion
     ├─ Measurement Buffer (rolling 10 min window)
     └─ Validation/QC
          ↓
-Pravaha Inference Service (runs every 10 sec)
+Aethelix Inference Service (runs every 10 sec)
     ├─ Read measurements
     ├─ Detect anomalies
     ├─ Rank root causes
@@ -88,7 +88,7 @@ Operators
 
 ## Why We're Building This
 
-Currently, Pravaha lives in code. Real operators need:
+Currently, Aethelix lives in code. Real operators need:
 
 1. **Continuous Monitoring** — Not just on-demand analysis
 2. **Real Data Integration** — Must connect to actual satellite feeds
@@ -269,8 +269,8 @@ When ready for actual satellite:
 
 2. **Deployment Container**
    ```bash
-   docker build -t pravaha-service .
-   docker run -e TELEMETRY_HOST=ground-station pravaha-service
+   docker build -t aethelix-service .
+   docker run -e TELEMETRY_HOST=ground-station aethelix-service
    ```
 
 3. **Integration Testing**
@@ -364,4 +364,4 @@ operational/
 **Status:** Ready for Phase 2  
 **Owner:** [Your team]  
 **Timeline:** 2-4 weeks to operational MVP  
-**Goal:** Get Pravaha running on real satellite by Q1 2026
+**Goal:** Get Aethelix running on real satellite by Q1 2026

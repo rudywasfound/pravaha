@@ -1,4 +1,4 @@
-# Pravaha: Complete Deliverables Manifest
+# Aethelix: Complete Deliverables Manifest
 
 ## What Was Delivered
 
@@ -171,7 +171,7 @@ python gsat6a/live_simulation_main.py forensics
    - Claim: `sensor_bias ⫫ battery_state`
    - Implication: Can detect measurement errors vs real faults
 
-**Final Verdict:** "All causal assumptions validated! Pravaha can safely use d-separation for inference."
+**Final Verdict:** "All causal assumptions validated! Aethelix can safely use d-separation for inference."
 
 ### GSAT-6A Demonstration ✓
 
@@ -240,7 +240,7 @@ For mission control:
 ## File Organization
 
 ```
-pravaha/
+aethelix/
 ├── causal_graph/
 │   ├── graph_definition.py          [Core DAG: 23 nodes, 28 edges]
 │   ├── root_cause_ranking.py        [Inference engine]
@@ -267,7 +267,7 @@ pravaha/
 ## How to Present This to ISRO
 
 ### Executive Summary (5 min)
-"Pravaha diagnoses satellite failures 36-90+ seconds earlier than traditional monitoring by using causal inference grounded in Pearl's framework."
+"Aethelix diagnoses satellite failures 36-90+ seconds earlier than traditional monitoring by using causal inference grounded in Pearl's framework."
 
 ### Technical Overview (15 min)
 1. Show CAUSAL_DAG_DEMONSTRATION.md

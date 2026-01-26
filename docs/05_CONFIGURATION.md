@@ -1,6 +1,6 @@
 # Configuration & Parameters
 
-Complete reference for tuning Pravaha's behavior.
+Complete reference for tuning Aethelix's behavior.
 
 ## Configuration Hierarchy
 
@@ -313,7 +313,7 @@ plotter.plot_residuals(
 
 ## Configuration File (Optional)
 
-Create `pravaha_config.yaml`:
+Create `aethelix_config.yaml`:
 
 ```yaml
 # Simulation
@@ -356,7 +356,7 @@ Load configuration:
 ```python
 import yaml
 
-with open("pravaha_config.yaml") as f:
+with open("aethelix_config.yaml") as f:
     config = yaml.safe_load(f)
 
 power_sim = PowerSimulator(**config["simulation"])

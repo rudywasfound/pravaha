@@ -1,10 +1,10 @@
 # Running the Framework
 
-Complete guide to executing Pravaha workflows and understanding the results.
+Complete guide to executing Aethelix workflows and understanding the results.
 
 ## Overview
 
-The Pravaha workflow consists of 5 phases:
+The Aethelix workflow consists of 5 phases:
 
 ```
 1. SIMULATION      -> Generate realistic telemetry
@@ -195,7 +195,7 @@ with open("batch_results.json", "w") as f:
 For high-frequency data processing:
 
 ```python
-import pravaha_core  # Rust bindings
+import aethelix_core  # Rust bindings
 from simulator.power import PowerSimulator
 
 # Generate telemetry
@@ -203,11 +203,11 @@ power_sim = PowerSimulator(duration_hours=1, sampling_rate_hz=100)  # 100 Hz
 power_data = power_sim.run_nominal()
 
 # Use Rust Kalman filter
-kf = pravaha_core.KalmanFilter(dt=0.01)  # 10 ms timestep
+kf = aethelix_core.KalmanFilter(dt=0.01)  # 10 ms timestep
 
 estimates = []
 for i in range(len(power_data.time)):
-    measurement = pravaha_core.Measurement()
+    measurement = aethelix_core.Measurement()
     measurement.battery_voltage = float(power_data.battery_voltage[i])
     measurement.battery_charge = float(power_data.battery_charge[i])
     measurement.battery_temp = 35.0

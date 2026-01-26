@@ -1,4 +1,4 @@
-# Pravaha: Causal Inference for Multi-Fault Satellite Failures
+# Aethelix: Causal Inference for Multi-Fault Satellite Failures
 
 Framework for inferring root causes in satellite systems experiencing multiple simultaneous degradations.
 
@@ -85,6 +85,38 @@ For implementation details, see [PROJECT_STATUS.md](PROJECT_STATUS.md).
 
 ---
 
+## Real Data Analysis: GSAT-6A Mission Failure
+
+Aethelix has been tested on **real satellite telemetry data** from the GSAT-6A failure (March 2018). The framework automatically discovers root causes and generates comprehensive visualizations:
+
+### Generated Analysis Graphs
+
+**1. Causal Graph** - Shows failure propagation through system
+![Causal Graph](gsat6a_causal_graph.png)
+
+**2. Mission Analysis** - Complete timeline from launch to failure
+![Mission Analysis](gsat6a_mission_analysis.png)
+
+**3. Failure Analysis** - Nominal vs. degraded comparison (9 panels)
+![Failure Analysis](gsat6a_failure_analysis.png)
+
+**4. Deviation Analysis** - Quantified deviations at each timepoint
+![Deviation Analysis](gsat6a_deviation_analysis.png)
+
+### Key Results
+
+From real telemetry data in `data/gsat6a_nominal.csv` and `data/gsat6a_failure.csv`:
+
+- **Detection Time**: T+36 seconds (root cause identified)
+- **Traditional Systems**: T+180 seconds (4x slower)
+- **Lead Time for Recovery**: 144 seconds
+- **Root Cause Confidence**: 46.1% with physical mechanisms
+- **Early Intervention Window**: Multiple recovery actions possible
+
+**See [Real Examples Documentation](docs/07_REAL_EXAMPLES.md) for detailed analysis with explanations.**
+
+---
+
 ## Quick Start
 
 ### Installation
@@ -94,7 +126,21 @@ source .venv/bin/activate  # or .venv\Scripts\activate on Windows
 pip install -r requirements.txt
 ```
 
-### Run Framework
+### Run GSAT-6A Analysis
+```bash
+# Generate all graphs and analysis from real telemetry data
+python gsat6a/mission_analysis.py
+```
+
+This will:
+- Load real CSV telemetry (nominal + failure)
+- Run baseline characterization
+- Perform automatic anomaly detection
+- Execute causal inference analysis
+- Generate 4 comprehensive visualizations
+- Output detailed timeline reconstruction
+
+### Run Full Framework
 ```bash
 python main.py
 ```
@@ -224,7 +270,7 @@ MEASUREMENT:
 ## Codebase Structure
 
 ```
-pravaha/
+aethelix/
 ├── main.py                        # Entry point (Phases 1-2)
 ├── simulator/
 │   └── power.py                   # Power subsystem simulator
@@ -283,7 +329,7 @@ Traditional threshold/correlation-based satellite monitoring fails in multi-faul
 2. Correlation doesn't distinguish cause from effect
 3. Cascading failures confuse simple pattern matching
 
-Pravaha's explicit causal DAG enables:
+Aethelix's explicit causal DAG enables:
 - **Accurate diagnosis** in multi-fault conditions
 - **Transparent reasoning** (mechanisms, paths, evidence)
 - **Operator confidence** (not black-box ML)

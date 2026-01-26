@@ -1,16 +1,16 @@
-# Pravaha Documentation
+# Aethelix Documentation
 
-Complete documentation for the Pravaha Satellite Causal Inference Framework.
+Complete documentation for the Aethelix Satellite Causal Inference Framework.
 
 ## Quick Links
 
 ### Getting Started (Start here!)
 1. **[Table of Contents](00_TABLE_OF_CONTENTS.md)** - Full documentation structure
-2. **[Introduction](01_INTRODUCTION.md)** - What is Pravaha and why use it
+2. **[Introduction](01_INTRODUCTION.md)** - What is Aethelix and why use it
 3. **[Installation](02_INSTALLATION.md)** - Set up your environment
 4. **[Quick Start](03_QUICKSTART.md)** - Run your first example (5 min)
 
-### Using Pravaha
+### Using Aethelix
 5. **[Running the Framework](04_RUNNING_FRAMEWORK.md)** - How to execute workflows
 6. **[Configuration](05_CONFIGURATION.md)** - Tune parameters
 7. **[Output Interpretation](06_OUTPUT_INTERPRETATION.md)** - Understand the results
@@ -45,7 +45,7 @@ Complete documentation for the Pravaha Satellite Causal Inference Framework.
 
 ## Usage Paths
 
-### I'm new to Pravaha
+### I'm new to Aethelix
 -> Read: [Introduction](01_INTRODUCTION.md) -> [Installation](02_INSTALLATION.md) -> [Quick Start](03_QUICKSTART.md)
 
 ### I want to run it
@@ -110,7 +110,7 @@ pandoc 00_TABLE_OF_CONTENTS.md 01_INTRODUCTION.md 02_INSTALLATION.md \
        15_PERFORMANCE.md 16_DEPLOYMENT.md 17_TROUBLESHOOTING.md \
        18_MONITORING.md 19_DEVELOPMENT.md 20_CONTRIBUTING.md \
        21_TESTING.md 22_GLOSSARY.md 23_FAQ.md 24_REFERENCES.md \
-       -o pravaha_documentation.pdf
+       -o aethelix_documentation.pdf
 ```
 
 ### Option 2: Using Python
@@ -139,7 +139,7 @@ with open("FULL_DOCUMENTATION.md", "w") as f:
 subprocess.run([
     "pandoc",
     "FULL_DOCUMENTATION.md",
-    "-o", "pravaha_documentation.pdf",
+    "-o", "aethelix_documentation.pdf",
     "--toc",
     "--toc-depth=2",
     "-V", "papersize=a4",
@@ -152,7 +152,7 @@ subprocess.run([
 Create `mkdocs.yml`:
 
 ```yaml
-site_name: Pravaha Documentation
+site_name: Aethelix Documentation
 site_description: Satellite Causal Inference Framework
 site_author: Your Name
 site_url: https://example.com
@@ -223,19 +223,19 @@ DOCUMENTATION/
 
 - **Documentation Version**: 1.0
 - **Last Updated**: January 2026
-- **Pravaha Version**: 1.0
+- **Aethelix Version**: 1.0
 - **Status**: Complete & Production-Ready
 
 ## Support
 
 For issues or questions:
-- **GitHub Issues**: https://github.com/rudywasfound/pravaha/issues
+- **GitHub Issues**: https://github.com/rudywasfound/aethelix/issues
 - **Documentation**: See FAQ and Troubleshooting sections
 - **Email**: Contact repository maintainers
 
 ## License
 
-Documentation is provided under the same license as Pravaha.
+Documentation is provided under the same license as Aethelix.
 
 ---
 

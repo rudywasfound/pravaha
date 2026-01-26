@@ -23,13 +23,13 @@ cargo build --release
 
 ### 1. As Python Extension (Fastest)
 ```python
-import pravaha_core
+import aethelix_core
 
 # Create filter
-kf = pravaha_core.KalmanFilter(dt=1.0)
+kf = aethelix_core.KalmanFilter(dt=1.0)
 
 # Process measurements
-measurement = pravaha_core.Measurement()
+measurement = aethelix_core.Measurement()
 measurement.battery_voltage = 28.5
 measurement.battery_charge = 95.0
 # ... set other fields
@@ -41,12 +41,12 @@ estimate = kf.get_estimate()  # JSON string
 ### 2. As CLI Tool
 ```bash
 # Process telemetry stream
-cat telemetry.jsonl | ./target/release/pravaha_core | jq '.confidence'
+cat telemetry.jsonl | ./target/release/aethelix_core | jq '.confidence'
 ```
 
 ### 3. As Rust Library (Zero-copy)
 ```rust
-use pravaha_core::{KalmanFilter, Measurement};
+use aethelix_core::{KalmanFilter, Measurement};
 
 let mut kf = KalmanFilter::new(1.0);
 let measurement = Measurement::new(Utc::now());
@@ -78,23 +78,23 @@ const estimate = Module.process_measurement(measurement);
 ```bash
 # Process JSON telemetry line-by-line
 echo '{"battery_voltage": 28.5, "battery_charge": 95.0, "battery_temp": 35.0, ...}' | \
-  ./target/release/pravaha_core
+  ./target/release/aethelix_core
 
 # Real-time stream
-cat satellite_telemetry.jsonl | ./target/release/pravaha_core > estimates.jsonl
+cat satellite_telemetry.jsonl | ./target/release/aethelix_core > estimates.jsonl
 ```
 
 ### As Python Module
 ```python
 from operational.telemetry_simulator import TelemetrySimulator
-import pravaha_core
+import aethelix_core
 
 sim = TelemetrySimulator("solar_degradation")
-kf = pravaha_core.KalmanFilter(dt=1.0)
+kf = aethelix_core.KalmanFilter(dt=1.0)
 
 for measurement in sim.generate_series(3600):
     # Convert to PyMeasurement
-    py_meas = pravaha_core.Measurement()
+    py_meas = aethelix_core.Measurement()
     py_meas.set_battery_voltage(measurement.battery_voltage_measured)
     # ... set all fields
     

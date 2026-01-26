@@ -1,4 +1,4 @@
-# Rust Integration with Pravaha Framework
+# Rust Integration with Aethelix Framework
 
 ## Architecture
 
@@ -7,7 +7,7 @@ Python Framework (causal_graph, gsat6a)
          ↓
     Detects dropout in telemetry
          ↓
-    Calls Rust binary (pravaha_core)
+    Calls Rust binary (aethelix_core)
          ↓
 Rust: Kalman Filter + Hidden State Inference
          ↓
@@ -74,7 +74,7 @@ cd rust_core && cargo build --release
 cd rust_core && cargo test
 
 # Run demo
-./rust_core/target/release/pravaha_core
+./rust_core/target/release/aethelix_core
 ```
 
 ## Output Format
@@ -119,7 +119,7 @@ For tighter integration without subprocess calls:
 
 ```python
 # PyO3 bindings (future)
-from pravaha_core import PowerSystemKalmanFilter, infer_hidden_states
+from aethelix_core import PowerSystemKalmanFilter, infer_hidden_states
 
 kf = PowerSystemKalmanFilter(nominal_voltage=28.0, nominal_capacity=50.0)
 predictions = infer_hidden_states(kf, gap_duration=5, load_power=300.0)

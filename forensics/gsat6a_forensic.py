@@ -4,7 +4,7 @@ GSAT-6A Forensic Mode: Timeline Reconstruction and Lead-Time Analysis
 This module provides specialized diagnostics for GSAT-6A, the actual Indian
 communications satellite that experienced a power bus failure in 2018.
 
-The Forensic Mode demonstrates Pravaha's capability to:
+The Forensic Mode demonstrates Aethelix's capability to:
 1. Reconstruct failure timelines from historical telemetry
 2. Detect root causes earlier than traditional threshold-based systems
 3. Quantify "lead time" - how many seconds earlier we identify the problem
@@ -17,7 +17,7 @@ GSAT-6A Context:
 - Critical issue: Traditional threshold monitoring missed early warning signs
 - By the time thresholds were triggered, the satellite was already in distress
 
-How Pravaha improves on traditional monitoring:
+How Aethelix improves on traditional monitoring:
 - Thresholds react only when values cross a fixed limit (late detection)
 - Causal inference detects patterns that precede explicit threshold violations (early detection)
 - Example: Battery voltage drops 2% → Our system connects this to solar degradation pattern
@@ -35,7 +35,7 @@ class ForensicEvent:
     """
     A single diagnostic event in the forensic timeline.
     
-    Represents a point where Pravaha detected anomalous behavior and can
+    Represents a point where Aethelix detected anomalous behavior and can
     pinpoint when the root cause likely originated.
     """
     
@@ -51,11 +51,11 @@ class ForensicEvent:
 @dataclass
 class ForensicLeadTime:
     """
-    Quantifies how early Pravaha detected a fault vs. traditional monitoring.
+    Quantifies how early Aethelix detected a fault vs. traditional monitoring.
     """
     
     root_cause: str
-    causal_detection_time: datetime      # When Pravaha first detected it
+    causal_detection_time: datetime      # When Aethelix first detected it
     threshold_detection_time: datetime   # When traditional threshold would trigger
     lead_time_seconds: float             # How many seconds earlier?
     lead_time_percentage: float          # Lead time as % of total failure progression
@@ -71,7 +71,7 @@ class GSAT6AForensicAnalyzer:
     2. Telemetry patterns that precede explicit failures
     3. Causal inference to identify failure sequences
     
-    The goal: Demonstrate that Pravaha would have detected the issue
+    The goal: Demonstrate that Aethelix would have detected the issue
     30-60 seconds earlier than traditional threshold-based systems.
     """
     
@@ -159,7 +159,7 @@ class GSAT6AForensicAnalyzer:
                     )
                 )
         
-        # Phase 2: Fault onset detection (where Pravaha shines)
+        # Phase 2: Fault onset detection (where Aethelix shines)
         # This is where we show lead-time advantage
         
         # Early indicators (subtle changes that precede explicit threshold violations)
@@ -215,7 +215,7 @@ class GSAT6AForensicAnalyzer:
     
     def compute_lead_time(
         self,
-        causal_detection_severity: float = 0.05,  # Pravaha detects at 5% deviation
+        causal_detection_severity: float = 0.05,  # Aethelix detects at 5% deviation
         threshold_trigger_severity: float = 0.20,  # Thresholds trigger at 20% deviation
         progression_rate: float = 0.1,             # Degradation rate (% per hour)
     ) -> ForensicLeadTime:
@@ -223,7 +223,7 @@ class GSAT6AForensicAnalyzer:
         Compute lead time advantage of causal inference vs thresholds.
         
         Args:
-            causal_detection_severity: At what severity does Pravaha detect? (0-1)
+            causal_detection_severity: At what severity does Aethelix detect? (0-1)
             threshold_trigger_severity: At what severity do thresholds trigger? (0-1)
             progression_rate: How fast does degradation progress? (fraction per hour)
             
@@ -234,7 +234,7 @@ class GSAT6AForensicAnalyzer:
         # Time to reach each severity level (assuming exponential growth)
         # degradation(t) = initial * exp(progression_rate * t)
         
-        # Time for Pravaha to detect
+        # Time for Aethelix to detect
         time_to_causal_detection = (
             np.log(causal_detection_severity) / progression_rate
             if progression_rate != 0
@@ -311,7 +311,7 @@ class GSAT6AForensicAnalyzer:
             f"\nRoot Cause: {lead_time.root_cause}"
         )
         print(
-            f"Pravaha Detection Time:     {lead_time.causal_detection_time.strftime('%H:%M:%S')}"
+            f"Aethelix Detection Time:     {lead_time.causal_detection_time.strftime('%H:%M:%S')}"
         )
         print(
             f"Threshold Detection Time:   {lead_time.threshold_detection_time.strftime('%H:%M:%S')}"
@@ -325,7 +325,7 @@ class GSAT6AForensicAnalyzer:
         print("-" * 80)
         
         implications = [
-            f"Pravaha identifies power subsystem degradation {lead_time.lead_time_seconds:.0f} seconds earlier",
+            f"Aethelix identifies power subsystem degradation {lead_time.lead_time_seconds:.0f} seconds earlier",
             "Operators have additional reaction time for corrective actions",
             "Reduced likelihood of cascading failures before human intervention",
             "Demonstrates value of causal reasoning over simple threshold monitoring",

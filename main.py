@@ -1,5 +1,5 @@
 """
-Main entry point for Pravaha causal inference framework.
+Main entry point for Aethelix causal inference framework.
 
 This module orchestrates the entire satellite anomaly diagnosis workflow:
 1. Initialize realistic simulators for power and thermal subsystems
@@ -9,7 +9,7 @@ This module orchestrates the entire satellite anomaly diagnosis workflow:
 5. Rank root causes using Bayesian causal inference
 6. Generate visualizations and detailed reports
 
-The workflow demonstrates how Pravaha can diagnose multi-fault scenarios
+The workflow demonstrates how Aethelix can diagnose multi-fault scenarios
 that would confuse simpler approaches (correlation, threshold checks, etc).
 For example, when solar panels degrade, it affects not just solar input
 but also battery temperature (secondary effect) due to power coupling.
@@ -73,7 +73,7 @@ class CombinedTelemetry:
 
 def main():
     """
-    Execute the full Pravaha workflow.
+    Execute the full Aethelix workflow.
     
     The workflow consists of three main phases that build on each other:
     Phase 1: Data generation (simulators produce realistic telemetry)
@@ -167,7 +167,7 @@ def main():
     plotter.plot_residuals(nominal, degraded, save_path=f"{output_dir}/residuals.png")
 
     # PHASE 4: CAUSAL INFERENCE
-    # This is the core innovation of Pravaha
+    # This is the core innovation of Aethelix
     # Instead of just finding deviations, we trace them back to root causes
     
     print("[6] Building causal graph...")

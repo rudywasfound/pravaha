@@ -2,13 +2,13 @@
 
 ## General Questions
 
-### Q: What is Pravaha used for?
+### Q: What is Aethelix used for?
 
-A: Pravaha diagnoses root causes of satellite failures. Unlike simple threshold-based systems, it uses causal reasoning to distinguish between causes and their effects. For example, if solar panels degrade, battery temperature may rise as a secondary effect - Pravaha correctly attributes both to solar degradation, not battery thermal issues.
+A: Aethelix diagnoses root causes of satellite failures. Unlike simple threshold-based systems, it uses causal reasoning to distinguish between causes and their effects. For example, if solar panels degrade, battery temperature may rise as a secondary effect - Aethelix correctly attributes both to solar degradation, not battery thermal issues.
 
-### Q: Do I need to be a researcher to use Pravaha?
+### Q: Do I need to be a researcher to use Aethelix?
 
-A: No. If you can install Python and run a command, you can use Pravaha. We provide:
+A: No. If you can install Python and run a command, you can use Aethelix. We provide:
 - Simple CLI (`python main.py`)
 - Python library for integration
 - Detailed documentation
@@ -16,9 +16,9 @@ A: No. If you can install Python and run a command, you can use Pravaha. We prov
 
 For advanced customization (adding subsystems, modifying the graph), some Python knowledge helps, but you can start simple.
 
-### Q: Is Pravaha a machine learning model?
+### Q: Is Aethelix a machine learning model?
 
-A: No. Pravaha uses explicit causal graphs backed by aerospace physics equations.
+A: No. Aethelix uses explicit causal graphs backed by aerospace physics equations.
 
 Key differences from ML:
 
@@ -32,7 +32,7 @@ Key differences from ML:
 
 **Deterministic**: Same inputs always produce same reasoning (not probabilistic guessing)
 
-### Q: How accurate is Pravaha?
+### Q: How accurate is Aethelix?
 
 A: Accuracy depends on:
 1. **Quality of causal graph**: How well does it represent reality?
@@ -43,7 +43,7 @@ In controlled tests with simulated data: 85-95% accuracy for single faults, 70-8
 
 **Real accuracy depends on your specific satellite and environment.**
 
-### Q: How does Pravaha differ from simple monitoring?
+### Q: How does Aethelix differ from simple monitoring?
 
 A: 
 
@@ -79,8 +79,8 @@ source .venv/bin/activate
 
 With:
 ```bash
-conda create -n pravaha python=3.10
-conda activate pravaha
+conda create -n aethelix python=3.10
+conda activate aethelix
 ```
 
 ### Q: What if pip install fails?
@@ -114,7 +114,7 @@ A: Yes. See [Performance Tuning](15_PERFORMANCE.md). Options:
 
 ### Q: Can I use real telemetry data?
 
-A: Currently, Pravaha uses simulated data. To use real data:
+A: Currently, Aethelix uses simulated data. To use real data:
 
 ```python
 # Load your telemetry data
@@ -149,7 +149,7 @@ sim = PowerSimulator(duration_hours=12)
 
 **2. Configuration file:**
 ```yaml
-# pravaha_config.yaml
+# aethelix_config.yaml
 simulation:
   duration_hours: 12
   sampling_rate_hz: 0.1
@@ -234,7 +234,7 @@ A: Depends on your use case:
 
 ### Q: Can I integrate with existing monitoring systems?
 
-A: Yes. Pravaha outputs JSON/CSV:
+A: Yes. Aethelix outputs JSON/CSV:
 
 ```python
 import json
@@ -258,7 +258,7 @@ Then ingest into your system via API, message queue, or file polling.
 
 ### Q: How do I handle missing data?
 
-A: Currently, Pravaha requires complete telemetry. For gaps:
+A: Currently, Aethelix requires complete telemetry. For gaps:
 
 1. **Interpolate**: Use scipy or pandas
 ```python
@@ -290,13 +290,13 @@ See [Causal Graph](08_CAUSAL_GRAPH.md) for details.
 
 ### Q: Can I deploy to production?
 
-A: Yes, Pravaha is production-ready. See [Deployment](16_DEPLOYMENT.md) for:
+A: Yes, Aethelix is production-ready. See [Deployment](16_DEPLOYMENT.md) for:
 - Docker containerization
 - Performance optimization
 - Monitoring and logging
 - Scaling strategies
 
-### Q: Is Pravaha cloud-compatible?
+### Q: Is Aethelix cloud-compatible?
 
 A: Yes. Deploy to:
 - AWS Lambda (serverless)
@@ -316,7 +316,7 @@ A: Minimal:
 
 ### Q: How do I monitor a deployed instance?
 
-A: See [Monitoring](18_MONITORING.md). Pravaha can emit:
+A: See [Monitoring](18_MONITORING.md). Aethelix can emit:
 - Diagnosis results to log files
 - Metrics (probability, confidence) to monitoring systems
 - Alerts when high-probability faults detected
@@ -348,7 +348,7 @@ A: Causes have identical evidence. This means:
 
 ### Q: I get different results each time
 
-A: Pravaha's results are deterministic (no randomness). If different:
+A: Aethelix's results are deterministic (no randomness). If different:
 1. Your input data changed
 2. You changed parameters
 3. You're comparing different scenarios
@@ -375,7 +375,7 @@ A: Yes, see [Causal Graph](08_CAUSAL_GRAPH.md). You can:
 
 ### Q: Can I use different inference algorithms?
 
-A: Currently, Pravaha uses Bayesian graph traversal. To experiment:
+A: Currently, Aethelix uses Bayesian graph traversal. To experiment:
 1. Fork the repository
 2. Modify `RootCauseRanker` class
 3. Implement alternative algorithm
@@ -389,7 +389,7 @@ A: Absolutely. See [Contributing](20_CONTRIBUTING.md) for:
 - Testing requirements
 - Documentation guidelines
 
-### Q: How is Pravaha licensed?
+### Q: How is Aethelix licensed?
 
 A: Check LICENSE file in repository for details.
 
@@ -400,8 +400,8 @@ A: Check LICENSE file in repository for details.
 1. Check [Table of Contents](00_TABLE_OF_CONTENTS.md) for more detailed docs
 2. Search [Troubleshooting](17_TROUBLESHOOTING.md)
 3. Review example code in `tests/` directory
-4. File an issue: https://github.com/rudywasfound/pravaha/issues
-5. Check project README: https://github.com/rudywasfound/pravaha
+4. File an issue: https://github.com/rudywasfound/aethelix/issues
+5. Check project README: https://github.com/rudywasfound/aethelix
 
 ---
 

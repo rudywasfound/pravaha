@@ -1,7 +1,7 @@
 """
 Root cause ranking algorithms for multi-fault diagnosis.
 
-This module implements the core inference engine of Pravaha: given observed
+This module implements the core inference engine of Aethelix: given observed
 telemetry deviations, rank which root causes best explain the observations.
 
 The algorithm works in three steps:

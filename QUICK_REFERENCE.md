@@ -4,13 +4,13 @@
 
 **What happened**: Solar array deployment malfunction on March 26, 2018
 **When detected (traditional)**: T+180 seconds (multiple alarms)
-**When detected (Pravaha)**: T+36 seconds (root cause diagnosis)
+**When detected (Aethelix)**: T+36 seconds (root cause diagnosis)
 **Advantage**: 2.4 minutes for emergency response
 
 ## Run the Analysis
 
 ```bash
-cd /home/atix/pravaha
+cd /home/atix/aethelix
 source .venv/bin/activate
 python gsat6a/mission_analysis.py
 ```
@@ -22,7 +22,7 @@ Output:
 
 ## The Key Findings
 
-| Event | Time | Traditional | Pravaha | Status |
+| Event | Time | Traditional | Aethelix | Status |
 |-------|------|-------------|---------|--------|
 | Failure onset | T+36s | ❌ No alert | ✅ 100% solar_degradation | DETECTED |
 | Pattern clear | T+180s | ✅ Multiple alarms | ✅ 100% confidence | TOO LATE |
@@ -88,7 +88,7 @@ if bus_voltage < 27 V: ALERT
 - At T+36s: 91.4 Ah, 11.78 V → No alert
 - At T+180s: 25 Ah, 10.3 V → Alert (too late)
 
-**Causal Inference (Pravaha)**
+**Causal Inference (Aethelix)**
 ```
 Observed deviations (>10%) → Trace to root causes
 Score: path_strength × consistency × severity
@@ -152,7 +152,7 @@ self.degraded_thermal = thermal_sim.run_degraded(
 - 28.9% solar loss matches eclipse cycles
 - No individual threshold triggers
 
-**How does Pravaha detect it?**
+**How does Aethelix detect it?**
 - Understands causal relationships
 - These specific metrics together = solar failure
 - Distinguishes cause from consequence

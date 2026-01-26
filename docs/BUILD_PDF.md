@@ -1,6 +1,6 @@
 # Building PDF Documentation
 
-Complete guide to converting Pravaha documentation to PDF.
+Complete guide to converting Aethelix documentation to PDF.
 
 ## Quick Start
 
@@ -41,7 +41,7 @@ pandoc \
   22_GLOSSARY.md \
   23_FAQ.md \
   24_REFERENCES.md \
-  -o pravaha_documentation.pdf \
+  -o aethelix_documentation.pdf \
   --toc \
   --toc-depth=2 \
   -V papersize=a4 \
@@ -50,7 +50,7 @@ pandoc \
   -V linestretch=1.15
 ```
 
-Output: `pravaha_documentation.pdf` (~150 pages)
+Output: `aethelix_documentation.pdf` (~150 pages)
 
 ## Installation Methods
 
@@ -90,7 +90,7 @@ docker run --rm \
   /data/00_TABLE_OF_CONTENTS.md \
   ... \
   /data/24_REFERENCES.md \
-  -o /data/pravaha_documentation.pdf \
+  -o /data/aethelix_documentation.pdf \
   --toc \
   --toc-depth=2
 ```
@@ -101,7 +101,7 @@ Create `build_pdf.py`:
 
 ```python
 #!/usr/bin/env python3
-"""Build Pravaha documentation PDF"""
+"""Build Aethelix documentation PDF"""
 
 import subprocess
 import sys
@@ -152,7 +152,7 @@ def build_pdf():
     cmd = [
         "pandoc",
         *doc_paths,
-        "-o", "pravaha_documentation.pdf",
+        "-o", "aethelix_documentation.pdf",
         "--toc",
         "--toc-depth=2",
         "-V", "papersize=a4",
@@ -162,11 +162,11 @@ def build_pdf():
     ]
     
     print(f"Building PDF with {len(documents)} documents...")
-    print(f"Command: {' '.join(cmd[:3])} ... -o pravaha_documentation.pdf")
+    print(f"Command: {' '.join(cmd[:3])} ... -o aethelix_documentation.pdf")
     
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)
-        print("[OK] PDF built successfully: pravaha_documentation.pdf")
+        print("[OK] PDF built successfully: aethelix_documentation.pdf")
         return True
     except subprocess.CalledProcessError as e:
         print(f"ERROR: {e.stderr}")
@@ -200,7 +200,7 @@ Create `cover.tex`:
     \centering
     \vspace*{2cm}
     
-    {\Huge\bfseries Pravaha}
+    {\Huge\bfseries Aethelix}
     \vspace{0.5cm}
     
     {\Large Satellite Causal Inference Framework}
@@ -228,7 +228,7 @@ Build with cover:
 ```bash
 pandoc cover.tex \
   00_TABLE_OF_CONTENTS.md ... 24_REFERENCES.md \
-  -o pravaha_documentation.pdf
+  -o aethelix_documentation.pdf
 ```
 
 ### Different Page Styles
@@ -308,15 +308,15 @@ After building, verify:
 
 ```bash
 # Check file exists and has reasonable size
-ls -lh pravaha_documentation.pdf
+ls -lh aethelix_documentation.pdf
 # Should be 2-5 MB
 
 # Check page count
-pdfinfo pravaha_documentation.pdf
+pdfinfo aethelix_documentation.pdf
 # Should show ~150 pages
 
 # Validate PDF (on macOS with ghostscript)
-gs -sDEVICE=nulldevice -dNODISPLAY -dBATCH pravaha_documentation.pdf
+gs -sDEVICE=nulldevice -dNODISPLAY -dBATCH aethelix_documentation.pdf
 ```
 
 ## Automation
@@ -345,14 +345,14 @@ jobs:
         run: |
           cd DOCUMENTATION
           pandoc 00_TABLE_OF_CONTENTS.md ... 24_REFERENCES.md \
-            -o pravaha_documentation.pdf \
+            -o aethelix_documentation.pdf \
             --toc --toc-depth=2
       
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: documentation
-          path: DOCUMENTATION/pravaha_documentation.pdf
+          path: DOCUMENTATION/aethelix_documentation.pdf
 ```
 
 ## Distribution
@@ -413,7 +413,7 @@ iconv -f ISO-8859-1 -t UTF-8 file.md -o file_fixed.md
 
 ```bash
 # Check output size
-ls -lh pravaha_documentation.pdf
+ls -lh aethelix_documentation.pdf
 
 # Compress
 gs -qs -dNOPAUSE -dBATCH -dSAFER \
@@ -426,7 +426,7 @@ gs -qs -dNOPAUSE -dBATCH -dSAFER \
    -dColorImageResolution=150 \
    -dGrayImageResolution=150 \
    -sOutputFile=compressed.pdf \
-   pravaha_documentation.pdf
+   aethelix_documentation.pdf
 ```
 
 ### Broken links in PDF

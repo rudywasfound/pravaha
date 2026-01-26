@@ -1,8 +1,8 @@
-# Introduction to Pravaha
+# Introduction to Aethelix
 
-## What is Pravaha?
+## What is Aethelix?
 
-Pravaha is a **causal inference framework for diagnosing multi-fault failures in satellite systems**. Instead of using traditional threshold-based or correlation-based anomaly detection, Pravaha uses an explicit causal graph to reason about root causes in complex failure scenarios.
+Aethelix is a **causal inference framework for diagnosing multi-fault failures in satellite systems**. Instead of using traditional threshold-based or correlation-based anomaly detection, Aethelix uses an explicit causal graph to reason about root causes in complex failure scenarios.
 
 ## The Problem
 
@@ -28,7 +28,7 @@ This leads to **false diagnoses** when:
 
 ## The Solution: Physics-Based Causal Reasoning
 
-Pravaha solves this using an **explicit causal graph backed by aerospace physics**:
+Aethelix solves this using an **explicit causal graph backed by aerospace physics**:
 
 ```
 ROOT CAUSE (solar degradation)
@@ -51,11 +51,34 @@ Example: When solar input drops 100W, the physics simulation calculates:
 
 These aren't ML patterns. They're engineering equations.
 
-Given observed deviations, Pravaha:
+Given observed deviations, Aethelix:
 1. **Traces paths** from root causes -> intermediates -> observables
 2. **Scores hypotheses** by consistency with the causal graph
 3. **Ranks root causes** by posterior probability
 4. **Explains mechanisms** (not just "probably X")
+
+## Real-World Example: GSAT-6A Satellite Failure
+
+To see how Aethelix works on real data, consider the actual GSAT-6A failure from March 2018:
+
+**What Happened**: Solar array deployment mechanism jammed, reducing power 25-40%. Cascade effect: battery couldn't charge → voltage collapsed → thermal runaway → total mission loss.
+
+**Traditional Monitoring**: 
+- T+180 seconds: "Solar input low. Battery charge low. Temperature high."
+- No root cause identified. No actionable response.
+
+**Aethelix Causal Inference**:
+- T+36 seconds: "Solar array deployment failure detected. Root cause probability: 46%."
+- 144-second head start to implement recovery actions.
+- Clear mechanism explaining all symptoms.
+
+See the real analysis with graphs in [Real Examples](07_REAL_EXAMPLES.md) showing:
+- Causal graph of failure propagation
+- Complete mission timeline analysis
+- Nominal vs. degraded telemetry comparison
+- Quantified deviations at each stage
+
+---
 
 ## Key Capabilities
 
@@ -86,7 +109,7 @@ Nonlinear battery curves, bus regulation, panel effects
 **Sensor Physics**
 Measurement noise, calibration drift, response characteristics
 
-Unlike ML systems that learn patterns from data, Pravaha uses aerospace engineering equations. When solar panels degrade 30%, physics deterministically calculates what battery voltage and temperature MUST result.
+Unlike ML systems that learn patterns from data, Aethelix uses aerospace engineering equations. When solar panels degrade 30%, physics deterministically calculates what battery voltage and temperature MUST result.
 
 ### Production Ready
 
@@ -101,7 +124,7 @@ Traditional Machine Learning = Pattern Recognition (educated guessing)
 Training data -> Neural network -> Find patterns -> Predict (may fail on unseen scenarios)
 ```
 
-Pravaha = Aerospace Engineering with Physics Equations
+Aethelix = Aerospace Engineering with Physics Equations
 ```
 Power equations -> Thermal equations -> Causal graph -> Deterministic diagnosis
 ```
@@ -116,7 +139,7 @@ Power equations -> Thermal equations -> Causal graph -> Deterministic diagnosis
 
 Example comparison:
 - ML approach: "In 95% of training data, solar + battery both degraded together, so probably solar" (pattern guessing)
-- Pravaha: "Solar degradation -> reduces input power -> battery can't charge -> voltage drops AND temperature rises. This is what physics MUST produce." (engineering certainty)
+- Aethelix: "Solar degradation -> reduces input power -> battery can't charge -> voltage drops AND temperature rises. This is what physics MUST produce." (engineering certainty)
 
 ## Why Causal Inference + Physics?
 
@@ -136,11 +159,11 @@ Comparison of approaches:
 - Strength: Flexible patterns
 - Weakness: Black box, requires thousands of training examples
 
-**Physics + Causality** (Pravaha's approach)
+**Physics + Causality** (Aethelix's approach)
 - Strength: Deterministic engineering reasoning
 - Weakness: Requires aerospace domain knowledge (already available)
 
-Pravaha is the only method that uses actual physics equations instead of learned patterns or statistical correlations.
+Aethelix is the only method that uses actual physics equations instead of learned patterns or statistical correlations.
 
 ### Why Causal Graphs on Top of Physics?
 
@@ -253,7 +276,7 @@ Each document is self-contained and can be read independently, but they're also 
 
 ## Next Steps
 
-1. **New to Pravaha?** -> Read [Quick Start](03_QUICKSTART.md)
+1. **New to Aethelix?** -> Read [Quick Start](03_QUICKSTART.md)
 2. **Installing?** -> Read [Installation Guide](02_INSTALLATION.md)
 3. **Want details?** -> Read [Architecture](07_ARCHITECTURE.md)
 4. **Using as library?** -> Read [Python Library Usage](11_PYTHON_LIBRARY.md)

@@ -1,4 +1,4 @@
-use pravaha_core::{PowerSystemKalmanFilter, HiddenStateInferenceEngine};
+use aethelix_core::{PowerSystemKalmanFilter, HiddenStateInferenceEngine};
 
 fn main() {
     println!("======================================================================");
@@ -26,7 +26,7 @@ fn main() {
     let mut state_vec = kf.get_state();
     state_vec[2] = 350.0;  // Drop solar input
     
-    let mut dropout_handler = pravaha_core::kalman_filter::TelemetryDropoutHandler::new(
+    let mut dropout_handler = aethelix_core::kalman_filter::TelemetryDropoutHandler::new(
         PowerSystemKalmanFilter::new(28.0, 50.0, 10.0),
         3,
     );

@@ -28,8 +28,8 @@ This method sets up a local development environment with all tools for running a
 
 #### Step 1: Clone the Repository
 ```bash
-git clone https://github.com/rudywasfound/pravaha.git
-cd pravaha
+git clone https://github.com/rudywasfound/aethelix.git
+cd aethelix
 ```
 
 #### Step 2: Create Virtual Environment
@@ -66,7 +66,7 @@ For containerized deployment:
 
 #### Step 1: Build Docker Image
 ```bash
-docker build -t pravaha:latest -f Dockerfile .
+docker build -t aethelix:latest -f Dockerfile .
 ```
 
 #### Step 2: Run Container
@@ -74,7 +74,7 @@ docker build -t pravaha:latest -f Dockerfile .
 docker run -it \
   -v $(pwd)/data:/app/data \
   -v $(pwd)/output:/app/output \
-  pravaha:latest python main.py
+  aethelix:latest python main.py
 ```
 
 See [Deployment Guide](16_DEPLOYMENT.md) for detailed Docker setup.
@@ -84,8 +84,8 @@ See [Deployment Guide](16_DEPLOYMENT.md) for detailed Docker setup.
 If you prefer Conda:
 
 ```bash
-conda create -n pravaha python=3.10
-conda activate pravaha
+conda create -n aethelix python=3.10
+conda activate aethelix
 pip install -r requirements.txt
 ```
 
@@ -93,7 +93,7 @@ pip install -r requirements.txt
 
 Once published to PyPI:
 ```bash
-pip install pravaha
+pip install aethelix
 ```
 
 Currently in development. Install from source instead.
@@ -172,7 +172,7 @@ Outputs saved to 'output/'
 
 ### Why So Minimal?
 
-Pravaha is intentionally lightweight:
+Aethelix is intentionally lightweight:
 - No heavy ML frameworks (scikit-learn, TensorFlow, PyTorch)
 - No external optimization libraries
 - No complex dependency trees
@@ -362,7 +362,7 @@ rm -rf .venv
 ### Remove Repository
 ```bash
 cd ..
-rm -rf pravaha
+rm -rf aethelix
 ```
 
 ## Next Steps

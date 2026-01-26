@@ -1,6 +1,6 @@
 # Quick Start Guide (5 Minutes)
 
-Get Pravaha running in 5 minutes with the default example.
+Get Aethelix running in 5 minutes with the default example.
 
 ## Prerequisites
 
@@ -14,8 +14,8 @@ Get Pravaha running in 5 minutes with the default example.
 
 ```bash
 # Clone repository
-git clone https://github.com/rudywasfound/pravaha.git
-cd pravaha
+git clone https://github.com/rudywasfound/aethelix.git
+cd aethelix
 
 # Create virtual environment
 python3 -m venv .venv
@@ -114,11 +114,11 @@ Expected files:
 
 ## Real Output Examples
 
-### Example 1: GSAT6A Telemetry Comparison
+### Example 1: GSAT6A Telemetry Deviations
 
-Below is actual output from the Pravaha framework analyzing a GSAT6A satellite scenario with solar array degradation:
+Below is actual output from the Aethelix framework analyzing a GSAT6A satellite scenario with solar array degradation:
 
-![GSAT6A Telemetry Comparison](../gsat6a_telemetry_comparison.png)
+![GSAT6A Telemetry Deviations](gsat6a_telemetry_deviations.png)
 
 This graph shows:
 
@@ -136,11 +136,11 @@ Battery State of Charge falls from 100% to 20%
 Power Bus Voltage drops from 12V to 10V (critical threshold)
 Thermal Status: Battery temperature rises to 44C
 
-### Example 2: GSAT6A Mission Failure Analysis
+### Example 2: GSAT6A Detection Comparison
 
-This comprehensive analysis shows how Pravaha diagnoses the root cause:
+This shows how Aethelix's causal inference compares to traditional threshold-based detection:
 
-![GSAT6A Mission Analysis](../gsat6a_mission_analysis.png)
+![GSAT6A Detection Comparison](gsat6a_detection_comparison.png)
 
 The analysis includes:
 
@@ -303,11 +303,11 @@ analyzer = ResidualAnalyzer(deviation_threshold=0.10)  # Stricter: 10%
 ### Error: "No module named 'simulator'"
 ```bash
 # Make sure you're in the right directory
-pwd  # should show .../pravaha
+pwd  # should show .../aethelix
 ls   # should see simulator/, causal_graph/, etc.
 
 # Make sure virtual environment is activated
-which python  # should show .../pravaha/.venv/bin/python
+which python  # should show .../aethelix/.venv/bin/python
 ```
 
 ### Plots not displaying

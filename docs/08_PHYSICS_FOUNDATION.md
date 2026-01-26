@@ -1,10 +1,10 @@
 # Physics Foundation: Why It's Not Guessing
 
-Pravaha is backed by real aerospace physics, not machine learning pattern recognition. This document explains the physics equations that power the inference engine.
+Aethelix is backed by real aerospace physics, not machine learning pattern recognition. This document explains the physics equations that power the inference engine.
 
 ## Core Principle
 
-**Pravaha is deterministic engineering, not probabilistic guessing.**
+**Aethelix is deterministic engineering, not probabilistic guessing.**
 
 When the causal graph traces:
 ```
@@ -215,7 +215,7 @@ Every edge in the causal graph is validated against aerospace physics.
 
 ## Bayesian Inference Over Physics, Not Instead Of
 
-Pravaha uses Bayes' theorem to combine:
+Aethelix uses Bayes' theorem to combine:
 
 1. **Physics predictions**: "If solar degrades 30%, we MUST see X behavior"
 2. **Observed deviations**: "We actually observed Y behavior"
@@ -239,7 +239,7 @@ Consistency: "Prediction doesn't match observation"
 Conclusion: P(sensor bias | data) = 5%
 ```
 
-## Equations Used in Pravaha
+## Equations Used in Aethelix
 
 ### Power System (simulator/power.py)
 

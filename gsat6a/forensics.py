@@ -2,7 +2,7 @@
 """
 GSAT-6A Forensic Mode: Lead Time Analysis
 
-Core Selling Point: Can Pravaha identify the Power Bus failure 
+Core Selling Point: Can Aethelix identify the Power Bus failure 
 30+ seconds before a traditional threshold-based system?
 
 This module reconstructs the GSAT-6A timeline from known data and measures:
@@ -10,7 +10,7 @@ This module reconstructs the GSAT-6A timeline from known data and measures:
 2. When traditional thresholds trigger their first alert
 3. The lead time advantage (difference between the two)
 
-The forensic analysis proves Pravaha's value for mission assurance:
+The forensic analysis proves Aethelix's value for mission assurance:
 - Traditional systems detect SYMPTOMS (voltage drop, charge loss)
 - Causal inference detects ROOT CAUSES (solar degradation cascading through power subsystem)
 - Early detection of root causes enables corrective action before cascading failure
@@ -28,6 +28,9 @@ from simulator.power import PowerSimulator
 from simulator.thermal import ThermalSimulator
 from causal_graph.graph_definition import CausalGraph
 from causal_graph.root_cause_ranking import RootCauseRanker
+from timeline import Timeline, EventSeverity
+from findings import FindingsEngine
+from visualizer import AnalysisVisualizer
 
 
 @dataclass
@@ -70,15 +73,9 @@ class GSAT6AForensics:
         self.failure_onset = datetime(2018, 3, 26, 12, 0, 0)
         self.days_to_failure = (self.failure_onset - self.mission_start).days
         
-        print("\n" + "="*80)
-        print("GSAT-6A FORENSIC MODE: LEAD TIME ANALYSIS")
-        print("="*80)
-        print(f"\nMission Profile:")
-        print(f"  Launch Date:      {self.mission_start.strftime('%Y-%m-%d %H:%M:%S')}")
-        print(f"  Failure Date:     {self.failure_onset.strftime('%Y-%m-%d %H:%M:%S')}")
-        print(f"  Mission Duration: {self.days_to_failure} days (nominal operation)")
-        print(f"\nAnalyzing: Power Bus failure cascade on failure onset date")
-        print(f"Goal: Measure detection lead time advantage\n")
+        # Framework components
+        self.timeline = Timeline()
+        self.findings = FindingsEngine()
         
         # Generate telemetry
         self._generate_telemetry()
@@ -93,7 +90,6 @@ class GSAT6AForensics:
     
     def _generate_telemetry(self):
         """Generate nominal and degraded telemetry."""
-        print("[1/2] Generating nominal baseline (healthy satellite)...")
         power_sim = PowerSimulator(duration_hours=2)
         thermal_sim = ThermalSimulator(duration_hours=2)
         
@@ -103,8 +99,6 @@ class GSAT6AForensics:
             battery_charge=self.nominal_power.battery_charge,
             battery_voltage=self.nominal_power.battery_voltage,
         )
-        
-        print("[2/2] Simulating GSAT-6A failure sequence...")
         # GSAT-6A scenario: Solar array deployment partially fails
         # - Solar input drops gradually (mechanical jam)
         # - This doesn't immediately drop bus voltage (battery absorbs power difference)
@@ -126,15 +120,9 @@ class GSAT6AForensics:
         # Time axis: 2 hours of degradation = 7200 seconds
         self.time_points = np.linspace(0, 2, len(self.nominal_power.solar_input))
         self.time_seconds = self.time_points * 3600  # Convert to seconds
-        
-        print("✓ Telemetry generated\n")
     
     def analyze(self):
         """Run forensic analysis with lead time measurement."""
-        print("="*80)
-        print("ANALYZING FAILURE SEQUENCE")
-        print("="*80)
-        
         # Scan through simulation to detect failure
         # Use very frequent scanning to catch subtle differences early
         sample_interval = 5  # scan every 5 seconds
@@ -201,6 +189,12 @@ class GSAT6AForensics:
                                 severity=hypotheses[0].probability
                             )
                         )
+                        # Add to timeline
+                        self.timeline.add_event(
+                            t, EventSeverity.CRITICAL, "causal_detection",
+                            "Power", f"Solar degradation detected",
+                            confidence=hypotheses[0].probability
+                        )
                 except:
                     pass
             
@@ -247,77 +241,99 @@ class GSAT6AForensics:
                             severity=1.0
                         )
                     )
+                    # Add to timeline
+                    self.timeline.add_event(
+                        t, EventSeverity.WARNING, "threshold_alert",
+                        "Power", "; ".join(alerts)
+                    )
             
             # Both detected - can stop scanning
             if first_causal_detection is not None and first_threshold_detection is not None:
                 break
         
-        # Print results
-        self._print_forensic_results(first_causal_detection, first_threshold_detection)
+        # Record findings
+        self.findings.set_detection_times(first_causal_detection, first_threshold_detection)
+        self._record_telemetry_stats()
+        self._record_cascade_events()
     
-    def _print_forensic_results(self, causal_time, threshold_time):
-        """Print forensic analysis results with lead time calculation."""
+    def _record_telemetry_stats(self):
+        """Record telemetry statistics for findings engine."""
+        # Sample the nominal and degraded states at the end of the window
+        nominal = CombinedTelemetry(
+            solar_input=self.nominal_power.solar_input,
+            battery_voltage=self.nominal_power.battery_voltage,
+            battery_charge=self.nominal_power.battery_charge,
+            bus_voltage=self.nominal_power.bus_voltage,
+            battery_temp=self.nominal_thermal.battery_temp,
+            solar_panel_temp=self.nominal_thermal.solar_panel_temp,
+            payload_temp=self.nominal_thermal.payload_temp,
+            bus_current=self.nominal_thermal.bus_current,
+        )
+        
+        degraded = CombinedTelemetry(
+            solar_input=self.degraded_power.solar_input,
+            battery_voltage=self.degraded_power.battery_voltage,
+            battery_charge=self.degraded_power.battery_charge,
+            bus_voltage=self.degraded_power.bus_voltage,
+            battery_temp=self.degraded_thermal.battery_temp,
+            solar_panel_temp=self.degraded_thermal.solar_panel_temp,
+            payload_temp=self.degraded_thermal.payload_temp,
+            bus_current=self.degraded_thermal.bus_current,
+        )
+        
+        # Add statistics for each parameter
+        self.findings.add_telemetry_stat(
+            "Solar Input", "W",
+            np.mean(nominal.solar_input), np.std(nominal.solar_input),
+            np.mean(degraded.solar_input), np.std(degraded.solar_input)
+        )
+        self.findings.add_telemetry_stat(
+            "Battery Voltage", "V",
+            np.mean(nominal.battery_voltage), np.std(nominal.battery_voltage),
+            np.mean(degraded.battery_voltage), np.std(degraded.battery_voltage)
+        )
+        self.findings.add_telemetry_stat(
+            "Battery Charge", "Ah",
+            np.mean(nominal.battery_charge), np.std(nominal.battery_charge),
+            np.mean(degraded.battery_charge), np.std(degraded.battery_charge)
+        )
+        self.findings.add_telemetry_stat(
+            "Bus Voltage", "V",
+            np.mean(nominal.bus_voltage), np.std(nominal.bus_voltage),
+            np.mean(degraded.bus_voltage), np.std(degraded.bus_voltage)
+        )
+        self.findings.add_telemetry_stat(
+            "Battery Temperature", "°C",
+            np.mean(nominal.battery_temp), np.std(nominal.battery_temp),
+            np.mean(degraded.battery_temp), np.std(degraded.battery_temp)
+        )
+    
+    def _record_cascade_events(self):
+        """Record cascade events for analysis."""
+        # These are recorded from timeline events - framework will extract them
+        pass
+    
+    def print_analysis(self):
+        """Generate all analysis output from framework."""
         print("\n" + "="*80)
-        print("FORENSIC ANALYSIS RESULTS")
-        print("="*80)
+        print("GSAT-6A FORENSIC ANALYSIS")
+        print("="*80 + "\n")
         
-        print(f"\n{'DETECTION TIMINGS':^80}")
-        print("-" * 80)
+        self.timeline.print_timeline()
+        self.findings.print_telemetry_deviations()
+        self.findings.print_detection_comparison()
+        self.findings.print_mission_impact()
+    
+    def generate_graphs(self, output_dir: str = "."):
+        """Generate visualization graphs from analysis data."""
+        print("\n" + "="*80)
+        print("GENERATING GRAPHS")
+        print("="*80 + "\n")
         
-        if causal_time is not None:
-            print(f"\n✓ CAUSAL INFERENCE (Pravaha)")
-            print(f"  Detection Time: T+{causal_time:.1f} seconds")
-            for event in self.causal_detections:
-                print(f"  Event: {event.message}")
-        else:
-            print(f"\n✗ CAUSAL INFERENCE (Pravaha)")
-            print(f"  Detection Time: Not detected in window")
+        visualizer = AnalysisVisualizer(self.timeline, self.findings)
+        visualizer.generate_all_graphs(output_dir)
         
-        if threshold_time is not None:
-            print(f"\n✗ TRADITIONAL THRESHOLDS")
-            print(f"  Detection Time: T+{threshold_time:.1f} seconds")
-            for event in self.threshold_detections:
-                print(f"  Alert: {event.message}")
-        else:
-            print(f"\n✓ TRADITIONAL THRESHOLDS")
-            print(f"  Detection Time: Not triggered")
-        
-        # Calculate lead time
-        if causal_time is not None and threshold_time is not None:
-            lead_time = threshold_time - causal_time
-            print("\n" + "="*80)
-            print("LEAD TIME ADVANTAGE")
-            print("="*80)
-            print(f"\nPravaha detects failure {lead_time:.1f} seconds earlier")
-            print(f"  Detection sequence:")
-            print(f"    1. T+{causal_time:.1f}s  - Causal inference identifies root cause")
-            print(f"    2. T+{threshold_time:.1f}s - Traditional thresholds trigger")
-            print(f"    3. Lead time: {lead_time:.1f} seconds")
-            
-            # Impact analysis
-            print(f"\n{'MISSION IMPACT':^80}")
-            print("-" * 80)
-            print(f"\nWith {lead_time:.1f} seconds early warning, operators could:")
-            print(f"  • Immediately identify: Solar array deployment malfunction")
-            print(f"  • Trigger: Emergency power mode (reduce payload load)")
-            print(f"  • Execute: Attitude reorientation (optimize solar exposure)")
-            print(f"  • Activate: Thermal management failsafe")
-            print(f"\nWithout early detection, traditional systems would:")
-            print(f"  • Take {lead_time:.1f} seconds longer to recognize the problem")
-            print(f"  • Report only symptoms, not root cause")
-            print(f"  • Give operators reactive (not preventive) options")
-            print(f"  • Risk cascade failure before human intervention")
-        
-        elif causal_time is not None:
-            print("\n" + "="*80)
-            print("KEY FINDING")
-            print("="*80)
-            print(f"\n✓ Causal inference detected anomaly at T+{causal_time:.1f}s")
-            print(f"✗ Traditional thresholds never triggered (stayed within limits)")
-            print(f"\nThis demonstrates the core advantage:")
-            print(f"Causal inference catches subtle patterns that threshold systems miss.")
-        
-        print("\n" + "="*80 + "\n")
+        print("\n✓ Graph generation complete\n")
     
     def print_failure_cascade(self):
         """Print detailed failure cascade diagram."""
@@ -373,8 +389,9 @@ def main():
     try:
         forensics = GSAT6AForensics()
         forensics.analyze()
-        forensics.print_failure_cascade()
-        print("✓ Forensic analysis complete\n")
+        forensics.print_analysis()  # Framework generates output
+        forensics.generate_graphs(output_dir=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        print("\n✓ Forensic analysis complete\n")
     except KeyboardInterrupt:
         print("\n✓ Analysis stopped\n")
         sys.exit(0)

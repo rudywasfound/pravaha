@@ -1,4 +1,4 @@
-# Pravaha: Satellite Causal Inference Framework
+# Aethelix: Satellite Causal Inference Framework
 ## Complete Documentation
 
 ---
@@ -113,8 +113,8 @@
 
 **Installation (1 minute)**
 ```bash
-git clone https://github.com/rudywasfound/pravaha.git
-cd pravaha
+git clone https://github.com/rudywasfound/aethelix.git
+cd aethelix
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -146,7 +146,7 @@ console report                 # Root cause ranking
 ## Support & Contact
 
 For issues, feature requests, or questions:
-- GitHub Issues: https://github.com/rudywasfound/pravaha/issues
+- GitHub Issues: https://github.com/rudywasfound/aethelix/issues
 - Documentation: See [FAQ](23_FAQ.md) and [Troubleshooting](17_TROUBLESHOOTING.md)
 
 ---

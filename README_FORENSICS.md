@@ -2,15 +2,15 @@
 
 ## Core Selling Point
 
-**Can Pravaha identify the Power Bus failure 30+ seconds before a traditional threshold-based system?**
+**Can Aethelix identify the Power Bus failure 30+ seconds before a traditional threshold-based system?**
 
-The answer is YES. This forensic mode demonstrates Pravaha's key advantage for mission assurance.
+The answer is YES. This forensic mode demonstrates Aethelix's key advantage for mission assurance.
 
 ## What is Forensic Mode?
 
 Forensic mode reconstructs the GSAT-6A failure timeline and measures the detection gap:
 
-- **Causal Inference (Pravaha)**: Detects the ROOT CAUSE by analyzing how telemetry deviations propagate through the causal graph
+- **Causal Inference (Aethelix)**: Detects the ROOT CAUSE by analyzing how telemetry deviations propagate through the causal graph
 - **Traditional Thresholds**: Detects SYMPTOMS by comparing individual parameters against fixed alarm limits
 
 ## Run the Analysis
@@ -30,7 +30,7 @@ python gsat6a/live_simulation_main.py
 The forensic analysis shows:
 
 ```
-CAUSAL INFERENCE (Pravaha)
+CAUSAL INFERENCE (Aethelix)
   Detection Time: T+0.0 seconds
   Event: Solar degradation detected (100% confidence)
 

@@ -4,7 +4,7 @@ d-Separation Analysis for Causal Graph
 
 This module implements Pearl's d-separation criterion to:
 1. Verify conditional independence assumptions
-2. Prove that Pravaha can ignore noise in some measurements
+2. Prove that Aethelix can ignore noise in some measurements
 3. Show why certain root causes are distinguishable
 4. Demonstrate causal isolation between subsystems
 
@@ -288,7 +288,7 @@ class DSeparationAnalyzer:
     
     def validate_causal_assumptions(self) -> Dict[str, bool]:
         """
-        Validate all critical causal assumptions for Pravaha.
+        Validate all critical causal assumptions for Aethelix.
         
         Returns:
             Dictionary mapping assumption name to validity (True = correct)
@@ -351,7 +351,7 @@ def main():
     print()
     if all_valid:
         print("✓ All causal assumptions validated!")
-        print("  Pravaha can safely use d-separation for inference.")
+        print("  Aethelix can safely use d-separation for inference.")
     else:
         print("✗ Some assumptions failed validation.")
         print("  Review causal graph structure.")

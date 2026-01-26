@@ -109,7 +109,7 @@ impl PyDropoutHandler {
 
 #[cfg(feature = "python")]
 #[pymodule]
-fn pravaha_core(py: Python, m: &PyModule) -> PyResult<()> {
+fn aethelix_core(py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<PyMeasurement>()?;
     m.add_class::<PyKalmanFilter>()?;
     m.add_class::<PyDropoutHandler>()?;
