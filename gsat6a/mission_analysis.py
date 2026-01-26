@@ -78,32 +78,33 @@ class GSAT6AMissionAnalysis:
     def _analyze_baseline(self):
         """Analyze nominal baseline characteristics."""
         nom = self.nominal_df
+        fail = self.failure_df
         
-        # Record nominal stats for findings
+        # Record telemetry stats comparing nominal vs degraded
         self.findings.add_telemetry_stat(
             "Solar Input", "W",
             nom['solar_input_w'].mean(), nom['solar_input_w'].std(),
-            nom['solar_input_w'].mean(), 0
+            fail['solar_input_w'].mean(), fail['solar_input_w'].std()
         )
         self.findings.add_telemetry_stat(
             "Battery Voltage", "V",
             nom['battery_voltage_v'].mean(), nom['battery_voltage_v'].std(),
-            nom['battery_voltage_v'].mean(), 0
+            fail['battery_voltage_v'].mean(), fail['battery_voltage_v'].std()
         )
         self.findings.add_telemetry_stat(
             "Battery Charge", "Ah",
             nom['battery_charge_ah'].mean(), nom['battery_charge_ah'].std(),
-            nom['battery_charge_ah'].mean(), 0
+            fail['battery_charge_ah'].mean(), fail['battery_charge_ah'].std()
         )
         self.findings.add_telemetry_stat(
             "Bus Voltage", "V",
             nom['bus_voltage_v'].mean(), nom['bus_voltage_v'].std(),
-            nom['bus_voltage_v'].mean(), 0
+            fail['bus_voltage_v'].mean(), fail['bus_voltage_v'].std()
         )
         self.findings.add_telemetry_stat(
             "Battery Temperature", "°C",
             nom['battery_temp_c'].mean(), nom['battery_temp_c'].std(),
-            nom['battery_temp_c'].mean(), 0
+            fail['battery_temp_c'].mean(), fail['battery_temp_c'].std()
         )
     
     def _detect_anomalies(self):
