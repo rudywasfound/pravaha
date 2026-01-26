@@ -1,0 +1,377 @@
+# Installation Guide
+
+## System Requirements
+
+### Minimum Requirements
+- **Python**: 3.8 or higher
+- **OS**: Linux, macOS, or Windows
+- **RAM**: 2 GB minimum (4 GB recommended)
+- **Disk**: 500 MB for codebase and dependencies
+
+### Recommended Setup
+- **Python**: 3.10 or higher
+- **RAM**: 8 GB
+- **GPU**: Optional (for accelerated numerical operations)
+
+### Supported Platforms
+- [OK] Ubuntu 20.04 LTS and later
+- [OK] Debian 11+
+- [OK] macOS 10.14+
+- [OK] Windows 10/11
+- [OK] CentOS 8+
+
+## Installation Methods
+
+### Method 1: Local Development (Recommended for First-Time Users)
+
+This method sets up a local development environment with all tools for running and modifying the code.
+
+#### Step 1: Clone the Repository
+```bash
+git clone https://github.com/rudywasfound/pravaha.git
+cd pravaha
+```
+
+#### Step 2: Create Virtual Environment
+```bash
+# On Linux/macOS:
+python3 -m venv .venv
+source .venv/bin/activate
+
+# On Windows (PowerShell):
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+
+# On Windows (Command Prompt):
+python -m venv .venv
+.venv\Scripts\activate.bat
+```
+
+Why virtual environment? It isolates project dependencies from your system Python, preventing version conflicts.
+
+#### Step 3: Install Dependencies
+```bash
+pip install --upgrade pip setuptools wheel
+pip install -r requirements.txt
+```
+
+#### Step 4: Verify Installation
+```bash
+python -c "import numpy; import matplotlib; print('[OK] All dependencies installed')"
+```
+
+### Method 2: Docker (Production Deployment)
+
+For containerized deployment:
+
+#### Step 1: Build Docker Image
+```bash
+docker build -t pravaha:latest -f Dockerfile .
+```
+
+#### Step 2: Run Container
+```bash
+docker run -it \
+  -v $(pwd)/data:/app/data \
+  -v $(pwd)/output:/app/output \
+  pravaha:latest python main.py
+```
+
+See [Deployment Guide](16_DEPLOYMENT.md) for detailed Docker setup.
+
+### Method 3: Conda (For Scientific Computing)
+
+If you prefer Conda:
+
+```bash
+conda create -n pravaha python=3.10
+conda activate pravaha
+pip install -r requirements.txt
+```
+
+### Method 4: Package Installation (Future)
+
+Once published to PyPI:
+```bash
+pip install pravaha
+```
+
+Currently in development. Install from source instead.
+
+## Rust Core (Optional)
+
+For high-performance telemetry processing with Rust acceleration:
+
+### Prerequisites
+- Rust 1.70+ ([install](https://rustup.rs/))
+- C compiler (gcc, clang, or MSVC)
+
+### Installation
+```bash
+cd rust_core
+cargo build --release
+
+# Optional: install Python bindings
+pip install -e .
+```
+
+See [Rust Integration](12_RUST_INTEGRATION.md) for detailed setup.
+
+## Verification & Testing
+
+### Quick Verification
+```bash
+python -c "
+import sys
+print(f'Python: {sys.version}')
+import numpy; print(f'NumPy: {numpy.__version__}')
+import matplotlib; print(f'Matplotlib: {matplotlib.__version__}')
+"
+```
+
+Expected output:
+```
+Python: 3.10.X (...)
+NumPy: 1.24.X
+Matplotlib: 3.7.X
+```
+
+### Run Basic Test
+```bash
+python -m unittest discover tests/ -v
+```
+
+Expected: All tests pass (30+ tests)
+
+### Run Main Program
+```bash
+python main.py
+```
+
+Expected output:
+```
+======================================================================
+Causal Inference for Satellite Fault Diagnosis
+======================================================================
+
+[1] Initializing simulators...
+[2] Running nominal scenario...
+[3] Running degraded scenario (multi-fault)...
+...
+Outputs saved to 'output/'
+```
+
+## Dependencies Explained
+
+### Core Dependencies
+
+| Package | Version | Purpose |
+|---------|---------|---------|
+| **NumPy** | >=1.20.0 | Numerical computing, arrays, linear algebra |
+| **Matplotlib** | >=3.3.0 | Plotting telemetry data and visualization |
+
+### Why So Minimal?
+
+Pravaha is intentionally lightweight:
+- No heavy ML frameworks (scikit-learn, TensorFlow, PyTorch)
+- No external optimization libraries
+- No complex dependency trees
+
+Benefits:
+- Fast installation (~30 seconds)
+- Small runtime footprint
+- Easy to audit for security
+- Works in constrained environments
+
+### Optional Dependencies
+
+For advanced features:
+
+```bash
+# For Jupyter notebooks
+pip install jupyter ipykernel
+
+# For API documentation generation
+pip install sphinx sphinx-rtd-theme
+
+# For code formatting and linting
+pip install black flake8 pylint
+
+# For testing with coverage
+pip install coverage pytest
+```
+
+## Troubleshooting Installation
+
+### Issue: Python not found
+
+**Symptom**: `python: command not found` or `'python' is not recognized`
+
+**Solution**:
+```bash
+# Check if Python 3 is available
+python3 --version
+
+# Use python3 instead of python
+python3 -m venv .venv
+```
+
+On Windows, ensure Python is added to PATH during installation.
+
+### Issue: Virtual environment activation fails
+
+**Symptom**: `activate: command not found` or `Invoke-WebRequest : The system cannot find the file specified`
+
+**Solution**:
+```bash
+# Verify .venv directory exists
+ls -la .venv/
+
+# On macOS/Linux, use full path:
+source ./venv/bin/activate
+
+# On Windows, use correct path:
+.venv\Scripts\activate.bat  # CMD
+.venv\Scripts\Activate.ps1   # PowerShell
+```
+
+### Issue: Pip installation fails
+
+**Symptom**: `ERROR: Could not find a version that satisfies the requirement`
+
+**Solution**:
+```bash
+# Upgrade pip first
+pip install --upgrade pip
+
+# Install with verbose output to see details
+pip install -r requirements.txt -v
+
+# If proxy issues, configure pip
+pip install -r requirements.txt --proxy [user:passwd@]proxy.server:port
+```
+
+### Issue: Import errors after installation
+
+**Symptom**: `ModuleNotFoundError: No module named 'numpy'`
+
+**Solution**:
+```bash
+# Verify virtual environment is activated
+which python  # or 'where python' on Windows
+
+# Should show path inside .venv/
+
+# Reinstall dependencies
+pip install --force-reinstall -r requirements.txt
+```
+
+### Issue: Matplotlib display problems
+
+**Symptom**: Plots not showing or error with matplotlib backend
+
+**Solution**:
+```python
+import matplotlib
+# Add to top of your script:
+matplotlib.use('Agg')  # Non-interactive backend
+
+# Or use environment variable:
+# export MPLBACKEND=Agg
+```
+
+## Post-Installation Setup
+
+### 1. Create Output Directory
+```bash
+mkdir -p output
+```
+
+### 2. Verify Data Directory
+```bash
+ls -la data/
+```
+
+Should contain sample telemetry files (optional).
+
+### 3. Configure Paths (Optional)
+Edit `main.py` to customize:
+- Input data directory
+- Output plot locations
+- Simulation parameters
+
+### 4. Test with Sample Data
+```bash
+python main.py
+ls -la output/
+```
+
+## IDE/Editor Setup
+
+### VS Code
+1. Install Python extension (ms-python.python)
+2. Select interpreter: `.venv/bin/python`
+3. Create `.vscode/settings.json`:
+```json
+{
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+    "python.formatting.provider": "black",
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true
+}
+```
+
+### PyCharm
+1. Open project
+2. Settings -> Project -> Python Interpreter
+3. Add Interpreter -> Existing Environment
+4. Select `.venv/bin/python`
+
+### Command Line / Vim
+```bash
+# Just ensure .venv/bin is in your PATH
+export PATH="$(pwd)/.venv/bin:$PATH"
+```
+
+## Updating Installation
+
+### Update Dependencies
+```bash
+pip install --upgrade -r requirements.txt
+```
+
+### Update Rust Core
+```bash
+cd rust_core
+cargo update
+cargo build --release
+```
+
+### Update Main Code
+```bash
+git pull origin main
+```
+
+## Uninstalling
+
+### Remove Virtual Environment
+```bash
+rm -rf .venv
+```
+
+### Remove Repository
+```bash
+cd ..
+rm -rf pravaha
+```
+
+## Next Steps
+
+1. **Verify everything works**: Run `python main.py`
+2. **Learn the basics**: Read [Quick Start](03_QUICKSTART.md)
+3. **Explore examples**: Check `tests/` directory
+4. **Configure for your needs**: Read [Configuration Guide](05_CONFIGURATION.md)
+
+---
+
+**Continue to:** [Quick Start ->](03_QUICKSTART.md)

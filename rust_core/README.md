@@ -150,12 +150,9 @@ cargo bench
 - [x] Python bindings (PyO3)
 - [x] CLI tool
 
-**In Progress:**
-- [ ] Extended Kalman Filter (nonlinear)
-- [ ] WASM compilation
-- [ ] C FFI bindings (cbindgen)
-
 **Planned:**
 - [ ] Async tokio support
 - [ ] Particle filters
 - [ ] Custom physics models
+- [ ] Extended Kalman Filter (nonlinear)
+- [ ] WASM compilation
